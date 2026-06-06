@@ -53,6 +53,7 @@ export class UsersController {
   }
 
   @Get('get-by-id-user')
+  @UseGuards(JwtAuthGuard)
   async GetByIdUser(@Req() req: any) {
     const data = await this.usersService.GetByIdUser(req.user.id);
     return {
