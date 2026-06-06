@@ -64,6 +64,7 @@ export class UsersController {
   }
 
   @Post('update-profile')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file', fileUploadInterceptor('./uploads')))
   async updateProfile(
     @Req() req: any,
@@ -84,6 +85,7 @@ export class UsersController {
   }
 
   @Get('get-paging-admin')
+  @UseGuards(JwtAuthGuard)
   async getPagingAdmin(@Req() req: any, @Query() query: any) {
     const data = await this.usersService.getPagingAdmin(req, query);
     return {
@@ -94,6 +96,7 @@ export class UsersController {
   }
 
   @Post('close-the-lock')
+  @UseGuards(JwtAuthGuard)
   async closeTheLock(@Body() body: any) {
     this.kafkaService.publish(DomainEvents.User_close_the_lock, body);
     return {
@@ -103,6 +106,7 @@ export class UsersController {
   }
 
   @Put('update-password/:id')
+  @UseGuards(JwtAuthGuard)
   async updatePassword(@Body() body: any, @Param() param: any) {
     const data = {
       id: param.id,
@@ -116,6 +120,7 @@ export class UsersController {
   }
 
   @Get('get-by-id/:id')
+  @UseGuards(JwtAuthGuard)
   async getById(@Req() req: any, @Param() param: any) {
     const data = await this.usersService.getById(req, param);
     return {
@@ -126,6 +131,7 @@ export class UsersController {
   }
 
   @Put('update/:id')
+  @UseGuards(JwtAuthGuard)
   async update(@Body() body: any, @Param() param: any) {
     const payload = {
       id: param.id,
