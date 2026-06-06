@@ -14,6 +14,7 @@ import { RolesModule } from './modules/roles/roles.module';
 import { getDatabaseConfig } from './database/database.config';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { ConversationsModule } from './modules/conversations/conversations.module';
+import { LiveMessagesModule } from './modules/live_messages/live_messages.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ConversationsModule } from './modules/conversations/conversations.modul
     UsersModule,
     RolesModule,
     ConversationsModule,
+    LiveMessagesModule,
 
   ],
   controllers: [AppController],

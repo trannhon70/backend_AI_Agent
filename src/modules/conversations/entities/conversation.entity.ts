@@ -1,5 +1,6 @@
+import { LiveMessage } from "src/modules/live_messages/entities/live_message.entity";
 import { User } from "src/modules/users/entities/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('conversations')
 export class Conversation {
@@ -11,16 +12,20 @@ export class Conversation {
     customerIp!: string;
 
     // Nhân viên đảm nhận chat
-    @Column({ name: 'assigned_user_id', nullable: true })
-    assignedUserId!: number | null;
+    @Column({ nullable: true })
+    assigned_user_id!: number | null;
 
     @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'assigned_user_id' })
     assignedUser!: User | null;
 
+    // 💬 messages
+    @OneToMany(() => LiveMessage, (message) => message.conversation)
+    messages!: LiveMessage[];
+
     //nếu khách hàng gửi -> lưu id máy tính và trình duyệt
     @Column({ nullable: true, default: '' })
-    idComputer!: string;
+    id_computer!: string;
 
     //Chuỗi User-Agent gốc từ trình duyệt hoặc thiết bị client gửi lên.
     @Column({ type: 'text', nullable: true })
@@ -72,4 +77,6 @@ export class Conversation {
     //thời gian tạo
     @Column({ nullable: true })
     created_at!: number;
+
+
 }
