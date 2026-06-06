@@ -13,6 +13,7 @@ import { UsersModule } from './modules/users/users.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { getDatabaseConfig } from './database/database.config';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { ConversationsModule } from './modules/conversations/conversations.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
     KafkaModule,
     UsersModule,
     RolesModule,
+    ConversationsModule,
 
   ],
   controllers: [AppController],
