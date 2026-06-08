@@ -177,6 +177,90 @@ export class UsersService {
   }
 
 
+  async getPagingNoDelete(user_id: number, query: any) {
+    try {
+      const user: any = await this.userRepo.findOne({ where: { id: user_id } })
+      const pageIndex = query.pageIndex ? parseInt(query.pageIndex, 10) : 1;
+      const pageSize = query.pageSize ? parseInt(query.pageSize, 10) : 10;
+      const search = query.search || "";
+      const skip = (pageIndex - 1) * pageSize;
+      let whereCondition = '';
+      const is_deleted = true
+      const parameters: any = {};
+      if ([CheckRoles.TUVAN, CheckRoles.QUANLY].includes(user.role_id)) {
+        whereCondition += 'user.id = :user_id';
+        parameters.user_id = user_id;
+      }
 
+      if (is_deleted) {
+        whereCondition += 'user.is_deleted = :is_deleted';
+        parameters.is_deleted = is_deleted;
+      }
+
+      if (search) {
+        if (whereCondition) whereCondition += ' AND ';
+        whereCondition += '(user.full_name LIKE :search OR user.email LIKE :search)';
+        parameters.search = `%${search}%`;
+      }
+
+      const qb = this.userRepo.createQueryBuilder('user')
+        .leftJoinAndSelect('user.role', 'role')
+        .skip(skip)
+        .take(pageSize)
+        .orderBy('user.id', 'DESC');
+
+      if (whereCondition) {
+        qb.where(whereCondition, parameters);
+      }
+      const [result, total] = await qb.getManyAndCount();
+      return {
+        data: result,
+        total: total,
+        pageIndex: pageIndex,
+        pageSize: pageSize,
+        totalPages: Math.ceil(total / pageSize),
+
+      };
+    } catch (error) {
+      console.log(error);
+      throw error
+    }
+  }
+
+  async getPagingUserFriend(req: any, query: any) {
+    try {
+      const pageIndex = query.pageIndex ? parseInt(query.pageIndex, 10) : 1;
+      const pageSize = query.pageSize ? parseInt(query.pageSize, 10) : 10;
+      const user_id = query.userId || "";
+      const search = query.search || "";
+      const skip = (pageIndex - 1) * pageSize;
+
+      const qb = this.userRepo.createQueryBuilder('user')
+        .where('user.id != :user_id', { user_id })
+        .andWhere('user.is_deleted = :is_deleted', { is_deleted: true });
+
+      // Nếu có giá trị search, thêm điều kiện LIKE vào fullName
+      if (search) {
+        qb.andWhere('user.full_name LIKE :search', { search: `%${search}%` });
+      }
+
+      qb.skip(skip)
+        .take(pageSize)
+        .orderBy('user.id', 'DESC');
+
+      const [result, total] = await qb.getManyAndCount();
+
+      return {
+        data: result,
+        total,
+        pageIndex,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize),
+      };
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
 
 }
