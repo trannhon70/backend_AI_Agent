@@ -38,6 +38,9 @@ export class User {
     @Column({ type: 'varchar', length: 255, nullable: true })
     avatar!: string;
 
+    @Column({ nullable: true, default: 1 })
+    quantity!: number;
+
     @Column({ nullable: true })
     created_at!: number;
 }

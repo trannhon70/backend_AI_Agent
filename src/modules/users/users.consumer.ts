@@ -85,6 +85,8 @@ export class UsersConsumer {
     async handleUserUpdateUser(@Payload() payload: any) {
         try {
             const { id, ...data } = payload;
+            console.log(payload, 'payload');
+
             const result = await this.userRepo.update(id, data)
             return {
                 success: true,
