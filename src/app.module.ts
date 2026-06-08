@@ -16,6 +16,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { ConversationsModule } from './modules/conversations/conversations.module';
 import { LiveMessagesModule } from './modules/live_messages/live_messages.module';
 import { FriendsModule } from './modules/friends/friends.module';
+import { FacebookWebhookModule } from './modules/facebook-webhook/facebook-webhook.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { FriendsModule } from './modules/friends/friends.module';
     ConversationsModule,
     LiveMessagesModule,
     FriendsModule,
+    FacebookWebhookModule,
 
   ],
   controllers: [AppController],
