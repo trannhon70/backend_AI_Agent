@@ -11,12 +11,11 @@ import { RedisModule } from './modules/redis/redis.module';
 import { KafkaModule } from './modules/kafka/kafka.module';
 import { UsersModule } from './modules/users/users.module';
 import { RolesModule } from './modules/roles/roles.module';
-import { getDatabaseConfig } from './database/database.config';
+import { getDatabaseConfig } from './config/database.config';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { ConversationsModule } from './modules/conversations/conversations.module';
 import { LiveMessagesModule } from './modules/live_messages/live_messages.module';
 import { FriendsModule } from './modules/friends/friends.module';
-import { FacebookWebhookModule } from './modules/facebook-webhook/facebook-webhook.module';
 
 @Module({
   imports: [
@@ -30,7 +29,7 @@ import { FacebookWebhookModule } from './modules/facebook-webhook/facebook-webho
     }),
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'), // Thư mục chứa file tĩnh
-      serveRoot: '/api/uploads',               // Đường dẫn để truy cập
+      serveRoot: '/api/shared/uploads',               // Đường dẫn để truy cập
     }),
     SocketModule,
     CustomJwtModule,
@@ -41,7 +40,6 @@ import { FacebookWebhookModule } from './modules/facebook-webhook/facebook-webho
     ConversationsModule,
     LiveMessagesModule,
     FriendsModule,
-    FacebookWebhookModule,
 
   ],
   controllers: [AppController],

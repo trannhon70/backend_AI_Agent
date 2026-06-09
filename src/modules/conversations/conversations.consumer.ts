@@ -3,7 +3,7 @@ import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
-import { currentTimestamp } from 'utils/currentTimestamp';
+import { currentTimestamp } from 'src/shared/utils/currentTimestamp';
 import { DomainEvents } from '../kafka/kafka.events';
 import { Conversation } from './entities/conversation.entity';
 

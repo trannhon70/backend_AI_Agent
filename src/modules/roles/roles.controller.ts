@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, UseGuards } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { RolesGuard } from 'src/common/guards/roles.guard';
-import { CheckRoles } from 'utils';
+import { CheckRoles } from 'src/shared/utils';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 

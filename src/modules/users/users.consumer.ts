@@ -4,7 +4,7 @@ import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
-import { currentTimestamp } from 'utils/currentTimestamp';
+import { currentTimestamp } from 'src/shared/utils/currentTimestamp';
 import { User } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
 import { DomainEvents } from '../kafka/kafka.events';

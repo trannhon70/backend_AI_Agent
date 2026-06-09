@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { RoleRepository } from './role.repository';
-import { currentTimestamp } from 'utils/currentTimestamp';
+import { currentTimestamp } from 'src/shared/utils/currentTimestamp';
 
 @Injectable()
 export class RolesService {

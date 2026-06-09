@@ -5,12 +5,12 @@ import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 import { ClientInfo } from 'src/common/checkIp';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { fileUploadInterceptor } from 'utils/file-upload.util';
+import { fileUploadInterceptor } from 'src/shared/utils/file-upload.util';
 import { KafkaService } from '../kafka/kafka.service';
 import { SocketService } from '../socket/socket.service';
 import { DomainEvents } from '../kafka/kafka.events';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { CheckRoles } from 'utils';
+import { CheckRoles } from 'src/shared/utils';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 

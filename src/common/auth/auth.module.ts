@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { expiresIn } from 'utils';
+import { expiresIn } from 'src/shared/utils';
 
 @Global()
 @Module({
