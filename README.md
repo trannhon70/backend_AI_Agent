@@ -144,3 +144,6 @@ cat /www/backup_utf8.sql | docker exec -i postgres psql -U postgres -d livechat
 maxmemory 1gb
 maxmemory-policy allkeys-lru
 notify-keyspace-events Ex
+
+## lệnh start ngrok
+ngrok http 5000

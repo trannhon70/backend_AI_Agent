@@ -1,5 +1,6 @@
 // create-admin.seeder.ts
 import { User } from 'src/modules/users/entities/user.entity';
+import { currentTimestamp } from 'src/shared/utils/currentTimestamp';
 import { DataSource } from 'typeorm';
 
 export class CreateAdminSeeder {
@@ -9,8 +10,9 @@ export class CreateAdminSeeder {
         await userRepository.save({
             full_name: 'Admin',
             email: 'admin@gmail.com',
-            password: '123456',
+            password: '123123@',
             role_id: 1,
+            created_at: currentTimestamp(),
         });
     }
 }

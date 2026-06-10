@@ -1,4 +1,5 @@
-import { Role } from 'src/modules/roles/entities/role.entity';
+import { Role } from '../../modules/roles/entities/role.entity';
+import { currentTimestamp } from '../../shared/utils/currentTimestamp';
 import { DataSource } from 'typeorm';
 
 export class CreateRoleSeeder {
@@ -7,13 +8,20 @@ export class CreateRoleSeeder {
 
         const roles = [
             {
-                name: 'ADMIN'
+                name: 'Owner',
+                created_at: currentTimestamp(),
             },
             {
-                name: 'STAFF'
+                name: 'Admin Manager',
+                created_at: currentTimestamp(),
             },
             {
-                name: 'CUSTOMER'
+                name: 'Sale',
+                created_at: currentTimestamp(),
+            },
+            {
+                name: 'CSKH',
+                created_at: currentTimestamp(),
             },
         ];
 
