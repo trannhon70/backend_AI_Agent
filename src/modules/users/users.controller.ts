@@ -55,14 +55,14 @@ export class UsersController {
   @Post('login-google')
   async loginGoogle(@Body() body: any) {
     const data = await this.usersService.loginGoogle(body);
-    // return {
-    //   statusCode: 1,
-    //   message: 'Đăng nhập thành công!',
-    //   token: data.token,
-    //   user: data.user,
-    //   startTime: data.startTime,
-    //   endTime: data.endTime
-    // };
+    return {
+      statusCode: 1,
+      message: 'Đăng nhập thành công!',
+      token: data.token,
+      user: data.user,
+      startTime: data.startTime,
+      endTime: data.endTime
+    };
   }
 
   @Get('get-by-id-user')

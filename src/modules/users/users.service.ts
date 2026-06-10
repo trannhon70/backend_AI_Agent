@@ -89,40 +89,61 @@ export class UsersService {
 
   async loginGoogle(body: any) {
     try {
-      const user = await this.userRepo.findOne({ where: { email: body.email } });
-      const hashPassword = await bcrypt.hash(body.password, saltOrRounds)
+      let user = await this.userRepo.findOne({
+        where: { email: body.email },
+      });
+
       if (!user) {
-        const newUser = this.userRepo.save([{
+        user = await this.userRepo.save({
           email: body.email,
           full_name: body.full_name,
           avatar: body.avatar,
-          password: hashPassword,
+          is_online: true,
           role_id: RoleEnum.ADMIN_MANAGE,
           created_at: currentTimestamp(),
-        }])
-
-        // const payload = {
-        //   email: user.email,
-        //   id: user.id,
-        //   full_name: user.full_name,
-        //   role: user.role,
-        // };
-
-        // const sessionToken = this.jwtService.sign(payload);
-
-        // // Lưu token mới vào Redis với thời gian hết hạn
-
-        // const sessionData = {
-        //   token: sessionToken,
-        //   expiresAt: Date.now() + expirationTime,
-        // };
-
-        // await this.redisService.set(`user:${user.id}:session`, sessionData, Math.floor(expirationTime / 1000));
+        });
+      } else {
+        await this.userRepo.update(
+          { id: user.id },
+          { is_online: true },
+        );
       }
 
-      console.log('user', user);
-    }
-    catch (error) {
+      await this.redisService.del(`user:${user.id}:session`);
+
+      const payload = {
+        email: user.email,
+        id: user.id,
+        full_name: user.full_name,
+        role: user.role,
+      };
+
+      const token = this.jwtService.sign(payload);
+
+      await this.redisService.set(
+        `user:${user.id}:session`,
+        {
+          token,
+          expiresAt: Date.now() + expirationTime,
+        },
+        Math.floor(expirationTime / 1000),
+      );
+
+      return {
+        token,
+        user: {
+          email: user.email,
+          id: user.id,
+          full_name: user.full_name,
+          created_at: user.created_at,
+          role: user.role,
+          is_online: user.is_online,
+          avatar: user.avatar,
+        },
+        startTime: currentTimestamp(),
+        endTime: currentTimestamp() + Math.floor(expirationTime / 1000),
+      };
+    } catch (error) {
       console.log(error);
       throw error;
     }
