@@ -6,3 +6,11 @@ export enum RoleEnum {
     SALE = 3,
     CSKH = 4,
 }
+
+export enum ProviderEnum {
+    LOCAL = 'local',
+    GOOGLE = 'google',
+    FACEBOOK = 'facebook',
+    GITHUB = 'github',
+    APPLE = 'apple',
+}

@@ -1,4 +1,5 @@
 import { Role } from 'src/modules/roles/entities/role.entity';
+import { ProviderEnum } from 'src/shared/enums/role.enum';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, OneToMany } from 'typeorm';
 
 @Entity('users')
@@ -41,6 +42,10 @@ export class User {
 
     @Column({ nullable: true, default: 1 })
     quantity!: number;
+
+    // tai khoản được tạo bằng liên kết nào
+    @Column({ type: 'enum', enum: ProviderEnum, default: ProviderEnum.LOCAL })
+    provider!: ProviderEnum;
 
     @Column({ nullable: true })
     created_at!: number;

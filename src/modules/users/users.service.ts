@@ -7,8 +7,7 @@ import { expirationTime } from 'src/shared/utils';
 import { currentTimestamp } from 'src/shared/utils/currentTimestamp';
 import { User } from './entities/user.entity';
 import { RedisService } from '../redis/redis.service';
-import { RoleEnum } from 'src/shared/enums/role.enum';
-let saltOrRounds = 10;
+import { ProviderEnum, RoleEnum } from 'src/shared/enums/role.enum';
 
 @Injectable()
 export class UsersService {
@@ -100,6 +99,7 @@ export class UsersService {
           avatar: body.avatar,
           is_online: true,
           role_id: RoleEnum.ADMIN_MANAGE,
+          provider: ProviderEnum.GOOGLE,
           created_at: currentTimestamp(),
         });
       } else {
