@@ -147,3 +147,6 @@ notify-keyspace-events Ex
 
 ## lệnh start ngrok
 ngrok http 5000
+
+## google console 
+https://console.cloud.google.com/apis/credentials?project=onbai-449403

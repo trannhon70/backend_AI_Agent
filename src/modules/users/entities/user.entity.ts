@@ -29,7 +29,8 @@ export class User {
     @Column({ nullable: true })
     phone!: string;
 
-    @Column({ default: true })
+    // false: active, true: deleted
+    @Column({ default: false })
     is_deleted!: boolean;
 
     @Column({ type: 'boolean', nullable: true, default: false })

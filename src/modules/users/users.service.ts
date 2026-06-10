@@ -31,7 +31,7 @@ export class UsersService {
     if (!user) {
       throw new BadRequestException('Email không tồn tại!');
     }
-    if (user.is_deleted === false) {
+    if (user.is_deleted === true) {
       throw new BadRequestException('Tài khoản này đã bị xóa!');
     }
 
@@ -185,7 +185,7 @@ export class UsersService {
       const search = query.search || "";
       const skip = (pageIndex - 1) * pageSize;
       let whereCondition = '';
-      const is_deleted = true
+      const is_deleted = false; // Chỉ lấy những người dùng chưa bị xóa
       const parameters: any = {};
       if ([CheckRoles.TUVAN, CheckRoles.QUANLY].includes(user.role_id)) {
         whereCondition += 'user.id = :user_id';

@@ -22,7 +22,6 @@ export class UsersConsumer {
     @EventPattern(DomainEvents.UserCreated)
     async handleUserCreated(@Payload() body: any) {
         try {
-            const users = await this.usersRepoConfig.findAll();
 
             const hashPassword = await bcrypt.hash(body.password, saltOrRounds)
             const data: any = {
