@@ -10,9 +10,9 @@ import { KafkaService } from '../kafka/kafka.service';
 import { SocketService } from '../socket/socket.service';
 import { DomainEvents } from '../kafka/kafka.events';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { CheckRoles } from 'src/shared/utils';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { RoleEnum } from 'src/shared/enums/role.enum';
 
 @Controller('users')
 export class UsersController {
@@ -25,7 +25,7 @@ export class UsersController {
   ) { }
 
   @Post('create')
-  @Roles(CheckRoles.ADMIN)
+  @Roles(RoleEnum.OWNER, RoleEnum.ADMIN_MANAGE)
   @UseGuards(JwtAuthGuard, RolesGuard)
   async create(@Body() body: any) {
     const check = await this.userRepo.findOne({ where: { email: body.email } });
@@ -52,6 +52,19 @@ export class UsersController {
     };
   }
 
+  @Post('login-google')
+  async loginGoogle(@Body() body: any) {
+    const data = await this.usersService.loginGoogle(body);
+    // return {
+    //   statusCode: 1,
+    //   message: 'Đăng nhập thành công!',
+    //   token: data.token,
+    //   user: data.user,
+    //   startTime: data.startTime,
+    //   endTime: data.endTime
+    // };
+  }
+
   @Get('get-by-id-user')
   @UseGuards(JwtAuthGuard)
   async GetByIdUser(@Req() req: any) {
@@ -59,110 +72,6 @@ export class UsersController {
     return {
       statusCode: 1,
       message: 'get by id user success!',
-      data: data
-    };
-  }
-
-  @Post('update-profile')
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('file', fileUploadInterceptor('./uploads')))
-  async updateProfile(
-    @Req() req: any,
-    @UploadedFile() file: Express.Multer.File,
-    @Body() body: any,
-
-  ) {
-    const payload = {
-      ...body,
-      userId: req.user.id,
-      file: file?.filename
-    }
-    this.kafkaService.publish(DomainEvents.User_update_profile, payload);
-    return {
-      statusCode: 1,
-      message: 'cập nhật thành công!',
-    };
-  }
-
-  @Get('get-paging-admin')
-  @UseGuards(JwtAuthGuard)
-  async getPagingAdmin(@Req() req: any, @Query() query: any) {
-    const data = await this.usersService.getPagingAdmin(req, query);
-    return {
-      statusCode: 1,
-      message: 'get paging user success!',
-      data: data
-    };
-  }
-
-  @Post('close-the-lock')
-  @UseGuards(JwtAuthGuard)
-  async closeTheLock(@Body() body: any) {
-    this.kafkaService.publish(DomainEvents.User_close_the_lock, body);
-    return {
-      statusCode: 1,
-      message: 'account locked successfully!',
-    };
-  }
-
-  @Put('update-password/:id')
-  @UseGuards(JwtAuthGuard)
-  async updatePassword(@Body() body: any, @Param() param: any) {
-    const data = {
-      id: param.id,
-      password: body.password
-    }
-    this.kafkaService.publish(DomainEvents.User_update_password, data);
-    return {
-      statusCode: 1,
-      message: 'update password successfully!',
-    };
-  }
-
-  @Get('get-by-id/:id')
-  @UseGuards(JwtAuthGuard)
-  async getById(@Req() req: any, @Param() param: any) {
-    const data = await this.usersService.getById(req, param);
-    return {
-      statusCode: 1,
-      message: 'get by id successfully!',
-      data: data
-    };
-  }
-
-  @Put('update/:id')
-  @UseGuards(JwtAuthGuard)
-  async update(@Body() body: any, @Param() param: any) {
-    const payload = {
-      id: param.id,
-      ...body
-    }
-    const result = await this.kafkaService.send(DomainEvents.User_update_item, payload);
-    return {
-      statusCode: 1,
-      message: 'update user successfully!',
-      data: result
-    };
-  }
-
-  @Get('get-paging-no-delete')
-  @UseGuards(JwtAuthGuard)
-  async getPagingNoDelete(@Req() req: any, @Query() query: any) {
-    const data = await this.usersService.getPagingNoDelete(req.user.id, query);
-    return {
-      statusCode: 1,
-      message: 'get paging user success!',
-      data: data
-    };
-  }
-
-  @Get('get-paging-user-friend')
-  @UseGuards(JwtAuthGuard)
-  async getPagingUserFriend(@Req() req: any, @Query() query: any) {
-    const data = await this.usersService.getPagingUserFriend(req, query);
-    return {
-      statusCode: 1,
-      message: 'get paging user success!',
       data: data
     };
   }

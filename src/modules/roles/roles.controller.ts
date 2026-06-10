@@ -1,16 +1,16 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, UseGuards } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { RolesGuard } from 'src/common/guards/roles.guard';
-import { CheckRoles } from 'src/shared/utils';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { RoleEnum } from 'src/shared/enums/role.enum';
 
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) { }
 
   @Post()
-  @Roles(CheckRoles.ADMIN)
+  @Roles(RoleEnum.OWNER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   async create(@Body() body: any) {
     const data = await this.rolesService.create(body);

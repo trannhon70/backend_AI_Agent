@@ -22,7 +22,6 @@ export class UsersConsumer {
     @EventPattern(DomainEvents.UserCreated)
     async handleUserCreated(@Payload() body: any) {
         try {
-
             const hashPassword = await bcrypt.hash(body.password, saltOrRounds)
             const data: any = {
                 role_id: body.role_id || null,
@@ -40,60 +39,5 @@ export class UsersConsumer {
         }
     }
 
-    @EventPattern(DomainEvents.User_update_profile)
-    async handleUserUpdateProfile(@Payload() payload: any) {
-        try {
-            const body = {
-                full_name: payload.full_name,
-                ngay_sinh: payload.ngay_sinh,
-                phone: payload.phone,
-                avatar: payload.file ? `${process.env.URL_BACKEND}/api/uploads/${payload.file}` : null
-            }
-            return await this.usersRepoConfig.update(Number(payload.userId), body)
-        } catch (error) {
-            this.logger.error('Failed to process user created event', error);
-            throw error;
-        }
-    }
 
-    @EventPattern(DomainEvents.User_close_the_lock)
-    async handleUserCloseTheLock(@Payload() payload: any) {
-        try {
-            if (payload.id) {
-                const result = await this.usersRepoConfig.update(payload.id, { is_deleted: payload.is_deleted });
-                return result
-            }
-        } catch (error) {
-            this.logger.error('Failed to process user created event', error);
-            throw error;
-        }
-    }
-
-    @EventPattern(DomainEvents.User_update_password)
-    async handleUserUpdatePassword(@Payload() payload: any) {
-        try {
-            const hashPassword = await bcrypt.hash(payload.password, saltOrRounds)
-            return await this.usersRepoConfig.update(payload.id, { password: hashPassword })
-        } catch (error) {
-            this.logger.error('Failed to process user created event', error);
-            throw error;
-        }
-    }
-
-    @MessagePattern(DomainEvents.User_update_item)
-    async handleUserUpdateUser(@Payload() payload: any) {
-        try {
-            const { id, ...data } = payload;
-            console.log(payload, 'payload');
-
-            const result = await this.userRepo.update(id, data)
-            return {
-                success: true,
-                result
-            };
-        } catch (error) {
-            this.logger.error('Failed to process user update event', error);
-            throw error;
-        }
-    }
 }
