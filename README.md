@@ -150,3 +150,6 @@ ngrok http 5000
 
 ## google console 
 https://console.cloud.google.com/apis/credentials?project=onbai-449403
+
+## doc facebook
+https://developers.facebook.com/apps/

@@ -23,7 +23,8 @@ export class UsersService {
 
     const user = await this.userRepo.findOne({
       where: {
-        email: body.email
+        email: body.email,
+        provider: ProviderEnum.LOCAL
       },
       relations: ['role'], // Liên kết với bảng Roles
     });
@@ -86,10 +87,10 @@ export class UsersService {
     }
   }
 
-  async loginGoogle(body: any) {
+  async loginV1(body: any) {
     try {
       let user = await this.userRepo.findOne({
-        where: { email: body.email },
+        where: { email: body.email, provider: body.provider },
       });
 
       if (!user) {
@@ -99,7 +100,7 @@ export class UsersService {
           avatar: body.avatar,
           is_online: true,
           role_id: RoleEnum.ADMIN_MANAGE,
-          provider: ProviderEnum.GOOGLE,
+          provider: body.provider,
           created_at: currentTimestamp(),
         });
       } else {

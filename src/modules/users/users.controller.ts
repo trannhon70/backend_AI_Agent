@@ -52,9 +52,9 @@ export class UsersController {
     };
   }
 
-  @Post('login-google')
-  async loginGoogle(@Body() body: any) {
-    const data = await this.usersService.loginGoogle(body);
+  @Post('login-v1')
+  async loginV1(@Body() body: any) {
+    const data = await this.usersService.loginV1(body);
     return {
       statusCode: 1,
       message: 'Đăng nhập thành công!',
@@ -64,6 +64,7 @@ export class UsersController {
       endTime: data.endTime
     };
   }
+
 
   @Get('get-by-id-user')
   @UseGuards(JwtAuthGuard)
