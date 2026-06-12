@@ -180,5 +180,13 @@ export class UsersService {
     return userData;
   }
 
+  async logout(userId: number) {
+    try {
+      await this.userRepo.update({ id: userId }, { is_online: false });
+      await this.redisService.del(`user:${userId}:session`);
+    } catch (error) {
+      throw error
+    }
+  }
 
 }

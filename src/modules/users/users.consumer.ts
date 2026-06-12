@@ -8,6 +8,8 @@ import { currentTimestamp } from 'src/shared/utils/currentTimestamp';
 import { User } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
 import { DomainEvents } from '../kafka/kafka.events';
+import { ProviderEnum } from 'src/shared/enums/role.enum';
+import { RedisService } from '../redis/redis.service';
 
 let saltOrRounds = 10;
 @Controller()
@@ -17,6 +19,8 @@ export class UsersConsumer {
         @InjectRepository(User)
         private readonly userRepo: Repository<User>,
         private readonly usersRepoConfig: UsersRepository,
+
+        private readonly redisService: RedisService,
     ) { }
 
     @EventPattern(DomainEvents.UserCreated)
@@ -30,9 +34,21 @@ export class UsersConsumer {
                 full_name: body.full_name || null,
                 ngay_sinh: body.ngay_sinh || null,
                 phone: body.phone || null,
+                provider: ProviderEnum.LOCAL,
                 created_at: currentTimestamp(),
             }
             return await this.usersRepoConfig.create(data)
+        } catch (error) {
+            this.logger.error('Failed to process user created event', error);
+            throw error;
+        }
+    }
+
+    @EventPattern(DomainEvents.UserUpdateIsOnlne)
+    async handleUserUpdateIsOnlne(@Payload() body: any) {
+        try {
+            await this.usersRepoConfig.update(Number(body.userId), { is_online: false })
+            await this.redisService.del(`user:${body.userId}:session`);
         } catch (error) {
             this.logger.error('Failed to process user created event', error);
             throw error;

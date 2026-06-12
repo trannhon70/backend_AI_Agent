@@ -1,5 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import Redis, { RedisOptions } from 'ioredis';
+import { KafkaService } from '../kafka/kafka.service';
+import { DomainEvents } from '../kafka/kafka.events';
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
@@ -22,6 +24,9 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
             return delay;
         },
     };
+    constructor(
+        private readonly kafkaService: KafkaService,
+    ) { }
 
     async onModuleInit() {
         this.redis = new Redis(this.redisOptions);
@@ -62,10 +67,13 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
             this.subscriber.on('message', async (channel, key) => {
                 if (channel !== '__keyevent@0__:expired') return;
-
-                this.logger.debug(`⏳ Key expired: ${key}`);
-
-                // TODO: handle expired logic here
+                const userMatch = key.match(/^user:(\d+):session$/);
+                if (userMatch) {
+                    const userId = parseInt(userMatch[1], 10);
+                    this.logger.debug(`⏳ Key expired: ${userId}`);
+                    this.kafkaService.publish(DomainEvents.UserUpdateIsOnlne, { userId })
+                    // TODO: handle expired logic here
+                }
             });
 
             this.logger.log('📡 Keyspace listener ready');

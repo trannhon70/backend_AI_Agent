@@ -6,8 +6,9 @@ import { KafkaConstants } from './modules/kafka/kafka.constants';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   app.enableCors({
-    origin: true, // khác '*' → NestJS sẽ tự reflect lại origin của request
+    origin: [process.env.URL_BACKEND, process.env.URL_FRONTEND],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
