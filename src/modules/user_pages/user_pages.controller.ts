@@ -1,34 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, UseGuards } from '@nestjs/common';
 import { UserPagesService } from './user_pages.service';
 import { CreateUserPageDto } from './dto/create-user_page.dto';
 import { UpdateUserPageDto } from './dto/update-user_page.dto';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @Controller('user-pages')
 export class UserPagesController {
-  constructor(private readonly userPagesService: UserPagesService) {}
+  constructor(
+    private readonly userPagesService: UserPagesService
+  ) { }
 
-  @Post()
-  create(@Body() createUserPageDto: CreateUserPageDto) {
-    return this.userPagesService.create(createUserPageDto);
+  @Get('get-paging')
+  @UseGuards(JwtAuthGuard)
+  async getpaging(@Req() req: any, @Query() query: any) {
+    const data = await this.userPagesService.getPaging(req.user.id, query);
+    return {
+      statusCode: 1,
+      message: 'get paging user pages success!',
+      data: data
+    };
   }
 
-  @Get()
-  findAll() {
-    return this.userPagesService.findAll();
-  }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userPagesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserPageDto: UpdateUserPageDto) {
-    return this.userPagesService.update(+id, updateUserPageDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userPagesService.remove(+id);
-  }
 }

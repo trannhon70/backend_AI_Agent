@@ -1,26 +1,58 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserPageDto } from './dto/create-user_page.dto';
-import { UpdateUserPageDto } from './dto/update-user_page.dto';
+import { JwtService } from '@nestjs/jwt';
+import { RedisService } from '../redis/redis.service';
+import { UserPage } from './entities/user_page.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UserPagesService {
-  create(createUserPageDto: CreateUserPageDto) {
-    return 'This action adds a new userPage';
-  }
+  constructor(
+    @InjectRepository(UserPage)
+    private UserPageRepo: Repository<UserPage>,
 
-  findAll() {
-    return `This action returns all userPages`;
-  }
+    private readonly jwtService: JwtService, // Inject JwtService
+    private readonly redisService: RedisService,
+  ) { }
+  async getPaging(user_id: number, query: any) {
+    try {
+      const pageIndex = query.pageIndex ? parseInt(query.pageIndex, 10) : 1;
+      const pageSize = query.pageSize ? parseInt(query.pageSize, 10) : 10;
+      const search = query.search || '';
+      const provider = query.provider || '';
+      const skip = (pageIndex - 1) * pageSize;
 
-  findOne(id: number) {
-    return `This action returns a #${id} userPage`;
-  }
+      const qb = this.UserPageRepo.createQueryBuilder('user_page')
+        .leftJoinAndSelect('user_page.page', 'page')
+        .where('user_page.user_id = :user_id', { user_id })
+        .skip(skip)
+        .take(pageSize)
+        .orderBy('user_page.id', 'DESC');
 
-  update(id: number, updateUserPageDto: UpdateUserPageDto) {
-    return `This action updates a #${id} userPage`;
-  }
+      if (provider) {
+        qb.andWhere('user_page.provider = :provider', {
+          provider,
+        });
+      }
 
-  remove(id: number) {
-    return `This action removes a #${id} userPage`;
+      if (search) {
+        qb.andWhere('page.page_name ILIKE :search', {
+          search: `%${search}%`,
+        });
+      }
+
+      const [result, total] = await qb.getManyAndCount();
+      return {
+        data: result,
+        total: total,
+        pageIndex: pageIndex,
+        pageSize: pageSize,
+        totalPages: Math.ceil(total / pageSize),
+
+      };
+    } catch (error) {
+      console.log(error);
+      throw error
+    }
   }
 }
