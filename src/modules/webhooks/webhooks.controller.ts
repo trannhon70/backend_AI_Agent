@@ -13,9 +13,6 @@ export class WebhooksController {
     @Query('hub.verify_token') token: string,
     @Query('hub.challenge') challenge: string,
   ) {
-    console.log(mode, 'mode');
-    console.log(token, 'token');
-    console.log(challenge, 'challenge');
 
     if (token === process.env.FB_VERIFY_TOKEN) {
       return challenge;

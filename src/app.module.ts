@@ -17,6 +17,7 @@ import { ConversationsModule } from './modules/conversations/conversations.modul
 import { LiveMessagesModule } from './modules/live_messages/live_messages.module';
 import { FriendsModule } from './modules/friends/friends.module';
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
+import { FanpagesModule } from './modules/fanpages/fanpages.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { WebhooksModule } from './modules/webhooks/webhooks.module';
     LiveMessagesModule,
     FriendsModule,
     WebhooksModule,
+    FanpagesModule,
 
   ],
   controllers: [AppController],
