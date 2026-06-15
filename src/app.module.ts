@@ -19,6 +19,7 @@ import { FriendsModule } from './modules/friends/friends.module';
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { FanpagesModule } from './modules/fanpages/fanpages.module';
 import { UserPagesModule } from './modules/user_pages/user_pages.module';
+import { PageTokensModule } from './modules/page_tokens/page_tokens.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { UserPagesModule } from './modules/user_pages/user_pages.module';
     WebhooksModule,
     FanpagesModule,
     UserPagesModule,
+    PageTokensModule,
 
   ],
   controllers: [AppController],
