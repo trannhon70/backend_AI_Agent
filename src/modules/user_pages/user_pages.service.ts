@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { RedisService } from '../redis/redis.service';
 import { UserPage } from './entities/user_page.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UserPagesService {
@@ -55,4 +55,36 @@ export class UserPagesService {
       throw error
     }
   }
+
+  async getCountProvider(user_id: number) {
+
+    try {
+      const result = await this.UserPageRepo
+        .createQueryBuilder('user_page')
+        .select('user_page.provider', 'provider')
+        .addSelect('COUNT(*)', 'count')
+        .where('user_page.user_id = :user_id', { user_id })
+        .groupBy('user_page.provider')
+        .getRawMany();
+
+      const total = result.reduce(
+        (sum, item) => sum + Number(item.count),
+        0,
+      );
+
+      return [
+        {
+          provider: 'Tất cả',
+          count: total,
+        },
+        ...result.map(item => ({
+          provider: item.provider,
+          count: Number(item.count),
+        })),
+      ];
+    } catch (error) {
+      throw error
+    }
+  }
+
 }

@@ -21,5 +21,15 @@ export class UserPagesController {
     };
   }
 
+  @Get('get-count-provider')
+  @UseGuards(JwtAuthGuard)
+  async getCountProvider(@Req() req: any) {
+    const data = await this.userPagesService.getCountProvider(req.user.id);
+    return {
+      statusCode: 1,
+      message: 'get paging user pages success!',
+      data: data
+    };
+  }
 
 }
