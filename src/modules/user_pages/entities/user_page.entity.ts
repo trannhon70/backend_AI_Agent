@@ -1,5 +1,6 @@
 import { Fanpage } from 'src/modules/fanpages/entities/fanpage.entity';
 import { User } from 'src/modules/users/entities/user.entity';
+import { ProviderEnum } from 'src/shared/enums/role.enum';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity('user_pages')
@@ -20,6 +21,9 @@ export class UserPage {
     @ManyToOne(() => Fanpage)
     @JoinColumn({ name: 'page_id' })
     page!: Fanpage;
+
+    @Column({ type: 'enum', enum: ProviderEnum, default: ProviderEnum.LOCAL })
+    provider!: ProviderEnum;
 
     @Column({ nullable: true })
     created_at!: number;

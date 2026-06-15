@@ -45,6 +45,7 @@ export class FanPagesConsumer {
                 await this.userPageRepo.save([{
                     user_id: item.user_id,
                     page_id: page.id,
+                    provider: ProviderEnum.FACEBOOK,
                     created_at: currentTimestamp(),
                 }])
 
