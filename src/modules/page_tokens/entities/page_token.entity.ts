@@ -1,6 +1,5 @@
 import { Fanpage } from 'src/modules/fanpages/entities/fanpage.entity';
-import { User } from 'src/modules/users/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('page_tokens')
 export class PageToken {

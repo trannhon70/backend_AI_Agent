@@ -1,34 +1,37 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { FanpagesService } from './fanpages.service';
 import { CreateFanpageDto } from './dto/create-fanpage.dto';
 import { UpdateFanpageDto } from './dto/update-fanpage.dto';
+import { KafkaService } from '../kafka/kafka.service';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { DomainEvents } from '../kafka/kafka.events';
 
 @Controller('fanpages')
 export class FanpagesController {
-  constructor(private readonly fanpagesService: FanpagesService) {}
+  constructor(
+    private readonly kafkaService: KafkaService,
+    private readonly fanpagesService: FanpagesService
+  ) { }
 
   @Post()
-  create(@Body() createFanpageDto: CreateFanpageDto) {
-    return this.fanpagesService.create(createFanpageDto);
+  @UseGuards(JwtAuthGuard)
+  async create(@Req() req: any, @Body() body: any) {
+    const payload: any = [];
+
+    for (const item of body) {
+      payload.push({
+        user_id: req.user.id,
+        ...item,
+      });
+    }
+
+    const result = await this.kafkaService.send(DomainEvents.FanPage_create, payload);
+    return {
+      statusCode: 1,
+      message: 'Kết nối facebook thành công!',
+      data: result
+    };
   }
 
-  @Get()
-  findAll() {
-    return this.fanpagesService.findAll();
-  }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.fanpagesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFanpageDto: UpdateFanpageDto) {
-    return this.fanpagesService.update(+id, updateFanpageDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.fanpagesService.remove(+id);
-  }
 }
