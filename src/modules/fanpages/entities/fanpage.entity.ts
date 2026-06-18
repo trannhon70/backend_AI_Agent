@@ -6,7 +6,7 @@ export class Fanpage {
     id!: number;
 
     @Column({ nullable: true })
-    facebook_page_id!: string;
+    page_id!: string;
 
     @Column({ nullable: true })
     page_name!: string;

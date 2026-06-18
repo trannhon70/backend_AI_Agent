@@ -1,26 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { CreateFanpageDto } from './dto/create-fanpage.dto';
 import { UpdateFanpageDto } from './dto/update-fanpage.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { RedisService } from '../redis/redis.service';
+import { Repository } from 'typeorm';
+import { Fanpage } from './entities/fanpage.entity';
 
 @Injectable()
 export class FanpagesService {
-  create(createFanpageDto: CreateFanpageDto) {
-    return 'This action adds a new fanpage';
+  constructor(
+    @InjectRepository(Fanpage)
+    private fanpageRepo: Repository<Fanpage>,
+
+    private readonly jwtService: JwtService, // Inject JwtService
+    private readonly redisService: RedisService,
+  ) { }
+  async getPageId(user_id: number, param: any) {
+    try {
+      return await this.fanpageRepo.findOne({ where: { page_id: param.id } })
+    } catch (error) {
+      throw error
+    }
   }
 
-  findAll() {
-    return `This action returns all fanpages`;
-  }
 
-  findOne(id: number) {
-    return `This action returns a #${id} fanpage`;
-  }
-
-  update(id: number, updateFanpageDto: UpdateFanpageDto) {
-    return `This action updates a #${id} fanpage`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} fanpage`;
-  }
 }

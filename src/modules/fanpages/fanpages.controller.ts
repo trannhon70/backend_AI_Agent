@@ -17,7 +17,6 @@ export class FanpagesController {
   @UseGuards(JwtAuthGuard)
   async create(@Req() req: any, @Body() body: any) {
     const payload: any = [];
-
     for (const item of body) {
       payload.push({
         user_id: req.user.id,
@@ -29,6 +28,19 @@ export class FanpagesController {
     return {
       statusCode: 1,
       message: 'Kết nối facebook thành công!',
+      data: result
+    };
+  }
+
+  @Get('get-page-id/:id')
+  @UseGuards(JwtAuthGuard)
+  async getPageId(@Req() req: any, @Param() param: any) {
+
+    const result = await this.fanpagesService.getPageId(req.user.id, param)
+
+    return {
+      statusCode: 1,
+      message: 'get page_id success!',
       data: result
     };
   }

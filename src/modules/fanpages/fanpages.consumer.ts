@@ -34,27 +34,35 @@ export class FanPagesConsumer {
     @MessagePattern(DomainEvents.FanPage_create)
     async handleFanPagesCreated(@Payload() body: any) {
         try {
-            body.map(async (item: any) => {
-                const page = await this.fanPagesRepoConfig.create({
-                    facebook_page_id: item.id,
-                    page_name: item.name,
-                    page_avatar: item.url,
-                    created_at: currentTimestamp()
-                })
+            for (const item of body) {
+                let page: any = await this.fanpageRepo.findOne({
+                    where: {
+                        page_id: item.id,
+                    },
+                });
 
-                await this.userPageRepo.save([{
+                if (!page) {
+                    page = await this.fanPagesRepoConfig.create({
+                        page_id: item.id,
+                        page_name: item.name,
+                        page_avatar: item.url,
+                        created_at: currentTimestamp(),
+                    });
+
+                    await this.pageTokenRepo.save({
+                        page_id: page.id,
+                        access_token: item.access_token,
+                        created_at: currentTimestamp(),
+                    });
+                }
+
+                await this.userPageRepo.save({
                     user_id: item.user_id,
-                    page_id: page.id,
-                    provider: ProviderEnum.FACEBOOK,
+                    page_id: page.id, // ✅ ID trong DB
+                    provider: item.provider,
                     created_at: currentTimestamp(),
-                }])
-
-                await this.pageTokenRepo.save([{
-                    page_id: page.id,
-                    access_token: item.access_token,
-                    created_at: currentTimestamp(),
-                }])
-            })
+                });
+            }
 
         } catch (error) {
             this.logger.error('Failed to process user created event', error);
