@@ -56,7 +56,6 @@ export class ConversationsConsumer {
                 const pageId = entry.id;
                 for (const event of entry.messaging) {
                     const conversation = await this.findOrCreateConversation(pageId, event.sender.id);
-                    console.log(event, 'event');
 
                     // lưu message
                     const savedMessage = await this.LiveMessageRepo.save({

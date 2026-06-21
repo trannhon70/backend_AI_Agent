@@ -14,6 +14,13 @@ export class Fanpage {
     @Column({ nullable: true })
     page_avatar!: string;
 
+    @Column({ nullable: true, type: "text" })
+    access_token!: string; // Long-lived User Token
+
+    //thời điểm quyền truy cập dữ liệu của người dùng sẽ hết hiệu lực nếu người dùng không tiếp tục sử dụng hoặc gia hạn quyền cho ứng dụng
+    @Column({ type: 'float', nullable: true })
+    data_access_expires_at!: number | null;
+
     @Column({ nullable: true })
     created_at!: number;
 

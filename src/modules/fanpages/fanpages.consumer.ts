@@ -29,26 +29,65 @@ export class FanPagesConsumer {
 
         private readonly redisService: RedisService,
     ) { }
+    async exchangeLongLivedToken(shortLivedToken: string) {
+        const url = new URL(
+            'https://graph.facebook.com/v25.0/oauth/access_token',
+        );
+
+        url.searchParams.append('grant_type', 'fb_exchange_token');
+        url.searchParams.append('client_id', process.env.FACEBOOK_APP_ID!);
+        url.searchParams.append('client_secret', process.env.FACEBOOK_APP_SECRET!);
+        url.searchParams.append('fb_exchange_token', shortLivedToken);
+
+        const response = await fetch(url.toString());
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(JSON.stringify(error));
+        }
+
+        return await response.json();
+    }
+
+    async debugToken(inputToken: string) {
+        const url = new URL('https://graph.facebook.com/debug_token');
+        url.searchParams.append('input_token', inputToken);
+        url.searchParams.append(
+            'access_token',
+            `${process.env.FACEBOOK_APP_ID}|${process.env.FACEBOOK_APP_SECRET}`,
+        );
+        const response = await fetch(url.toString());
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(JSON.stringify(error));
+        }
+        return await response.json();
+    }
 
     @MessagePattern(DomainEvents.FanPage_connect_facebook)
     async handleFanPagesCreated(@Payload() payload: any) {
         try {
+            // tiến hành long token lên thời gian tối đa khoảng 90 ngày
+            const token = await this.exchangeLongLivedToken(payload.access_token);
+            const debugToken = await this.debugToken(token.access_token);
+
             // // ✅ lấy danh sách page kết nối facebook
             const result = await fetch(
                 'https://graph.facebook.com/v25.0/me/accounts?fields=id,name,category,picture.type(large),access_token',
                 {
                     headers: {
-                        Authorization: `Bearer ${payload.access_token}`, // <-- fix ở đây
+                        Authorization: `Bearer ${token.access_token}`, // <-- fix ở đây
                     },
                 }
             );
+
             const fanpages = await result.json();
             const pages = fanpages?.data?.map((item: any) => ({
                 id: item.id,
                 name: item.name,
                 url: item.picture?.data?.url,
                 provider: ProviderEnum.FACEBOOK,
-                access_token: item.access_token
+                access_token: item.access_token,
             }));
 
             for (const item of pages) {
@@ -63,6 +102,8 @@ export class FanPagesConsumer {
                         page_id: item.id,
                         page_name: item.name,
                         page_avatar: item.url,
+                        access_token: token.access_token,
+                        data_access_expires_at: debugToken.data.data_access_expires_at,
                         created_at: currentTimestamp(),
                     });
 
