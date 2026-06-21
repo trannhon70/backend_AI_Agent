@@ -7,5 +7,8 @@ export enum DomainEvents {
     Friend_create = 'friend.create',
 
     // fanpages
-    FanPage_connect_facebook = 'fanPage.connect_facebook'
+    FanPage_connect_facebook = 'fanPage.connect_facebook',
+
+    //conversation
+    conversation_create = 'conversation.create'
 }

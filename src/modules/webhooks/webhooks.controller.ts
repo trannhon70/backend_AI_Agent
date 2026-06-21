@@ -1,11 +1,14 @@
 import { Body, Controller, ForbiddenException, Get, Post, Query, Req } from '@nestjs/common';
 import { WebhooksService } from './webhooks.service';
 import { CheckObjectFacebook } from 'src/shared/utils';
+import { KafkaService } from '../kafka/kafka.service';
+import { DomainEvents } from '../kafka/kafka.events';
 
 @Controller('webhooks')
 export class WebhooksController {
   constructor(
-    private readonly webhooksService: WebhooksService
+    private readonly webhooksService: WebhooksService,
+    private readonly kafkaService: KafkaService,
   ) { }
 
   @Get('facebook')
@@ -23,11 +26,11 @@ export class WebhooksController {
   }
 
   @Post('facebook')
-  handleWebhook(@Req() req: any, @Body() body: any) {
+  async handleWebhook(@Req() req: any, @Body() body: any) {
 
-    console.dir(body, 'body');
+
     if (body.object === CheckObjectFacebook.PAGE) {
-
+      await this.kafkaService.publish(DomainEvents.conversation_create, body.entry);
     }
     return 'EVENT_RECEIVED';
   }
