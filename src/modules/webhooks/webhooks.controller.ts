@@ -1,7 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ForbiddenException } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Post, Query, Req } from '@nestjs/common';
 import { WebhooksService } from './webhooks.service';
-import { CreateWebhookDto } from './dto/create-webhook.dto';
-import { UpdateWebhookDto } from './dto/update-webhook.dto';
 
 @Controller('webhooks')
 export class WebhooksController {
@@ -22,8 +20,9 @@ export class WebhooksController {
   }
 
   @Post('facebook')
-  handleWebhook(@Body() body: any) {
-    console.log(body);
+  handleWebhook(@Req() req: any, @Body() body: any) {
+
+    console.dir(body, { depth: null });
     return 'EVENT_RECEIVED';
   }
 }

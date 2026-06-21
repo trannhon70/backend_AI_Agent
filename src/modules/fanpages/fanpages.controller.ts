@@ -13,18 +13,15 @@ export class FanpagesController {
     private readonly fanpagesService: FanpagesService
   ) { }
 
-  @Post()
+  @Post('connect-page-facebook')
   @UseGuards(JwtAuthGuard)
-  async create(@Req() req: any, @Body() body: any) {
-    const payload: any = [];
-    for (const item of body) {
-      payload.push({
-        user_id: req.user.id,
-        ...item,
-      });
+  async createConnectPageFacebook(@Req() req: any, @Body() body: any) {
+    const payload = {
+      ...body,
+      user_id: req.user.id
     }
 
-    const result = await this.kafkaService.send(DomainEvents.FanPage_create, payload);
+    const result = await this.kafkaService.send(DomainEvents.FanPage_connect_facebook, payload);
     return {
       statusCode: 1,
       message: 'Kết nối facebook thành công!',
