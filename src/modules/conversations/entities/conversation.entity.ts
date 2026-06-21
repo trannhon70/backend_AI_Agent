@@ -7,10 +7,6 @@ export class Conversation {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    // Người dùng có thể không có tài khoản → lưu IP
-    @Column({ nullable: true })
-    customerIp!: string;
-
     // Nhân viên đảm nhận chat
     @Column({ nullable: true })
     assigned_user_id!: number | null;
@@ -23,60 +19,34 @@ export class Conversation {
     @OneToMany(() => LiveMessage, (message) => message.conversation)
     messages!: LiveMessage[];
 
-    //nếu khách hàng gửi -> lưu id máy tính và trình duyệt
-    @Column({ nullable: true, default: '' })
-    id_computer!: string;
-
-    //Chuỗi User-Agent gốc từ trình duyệt hoặc thiết bị client gửi lên.
-    @Column({ type: 'text', nullable: true })
-    userAgent!: string;
-
-    //Tên trình duyệt mà client đang sử dụng.
-    @Column({ type: 'text', nullable: true })
-    browser!: string;
-
-    //Hệ điều hành của thiết bị client.
-    @Column({ nullable: true, default: '' })
-    os!: string;
-
-    //loại thiết bị đang sử dụng
-    @Column({ nullable: true, default: '' })
-    device!: string;
-
-    //loại thiết bị đang sử dụng
-    @Column({ nullable: true, default: false })
-    online!: boolean;
-
+    //hội thoại này thuộc Facebook Page nào
     @Column({ nullable: true })
-    country!: string;
+    page_id!: string;
 
+    //khách hàng đang nhắn tin
     @Column({ nullable: true })
-    city!: string;
+    customer_id!: string;
 
+    // last_message tin nhắn mới nhất
     @Column({ nullable: true })
-    region!: string;
+    last_message_id!: number | null;
 
+    @ManyToOne(() => LiveMessage, { nullable: true, onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'last_message_id' })
+    lastMessage!: LiveMessage | null;
+
+    @Column({ type: 'float', nullable: true })
+    last_message_at!: number | null;
+
+    //Số tin nhắn chưa đọc từ phía khách hàng gửi vào
     @Column({ nullable: true })
-    name!: string;
+    unread_count!: number;
 
-    @Column({ type: 'text', nullable: true })
-    url!: string;
+    //Thời điểm cuộc hội thoại được tạo lần đầu
+    @Column({ type: 'float', nullable: true })
+    created_at!: number | null;
 
-    //Địa chỉ khi user chấp nhận xác định vị trí
-    @Column({ type: 'text', nullable: true })
-    address!: string;
-
-    //mã hóa của analytics để xác định lượt truy cập quảng cáo 
-    @Column({ type: 'varchar', nullable: true })
-    gclid!: string;
-
-    //bot google thả vào
-    @Column({ type: 'text', nullable: true })
-    bot!: string;
-
-    //thời gian tạo
-    @Column({ nullable: true })
-    created_at!: number;
-
-
+    //Thời điểm cuộc hội thoại được tạo lần đầu
+    @Column({ type: 'float', nullable: true })
+    updated_at!: number | null;
 }

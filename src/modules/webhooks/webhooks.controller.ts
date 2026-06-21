@@ -1,9 +1,12 @@
 import { Body, Controller, ForbiddenException, Get, Post, Query, Req } from '@nestjs/common';
 import { WebhooksService } from './webhooks.service';
+import { CheckObjectFacebook } from 'src/shared/utils';
 
 @Controller('webhooks')
 export class WebhooksController {
-  constructor(private readonly webhooksService: WebhooksService) { }
+  constructor(
+    private readonly webhooksService: WebhooksService
+  ) { }
 
   @Get('facebook')
   verifyWebhook(
@@ -22,7 +25,10 @@ export class WebhooksController {
   @Post('facebook')
   handleWebhook(@Req() req: any, @Body() body: any) {
 
-    console.dir(body, { depth: null });
+    console.dir(body, 'body');
+    if (body.object === CheckObjectFacebook.PAGE) {
+
+    }
     return 'EVENT_RECEIVED';
   }
 }

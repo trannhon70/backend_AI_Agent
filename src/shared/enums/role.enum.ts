@@ -14,3 +14,17 @@ export enum ProviderEnum {
     GITHUB = 'github',
     APPLE = 'apple',
 }
+
+export enum MessageDirection {
+    INBOUND = 'inbound',   // khách gửi vào
+    OUTBOUND = 'outbound', // agent/bot gửi ra
+}
+
+export enum MessageType {
+    TEXT = 'text',
+    IMAGE = 'image',
+    AUDIO = 'audio',
+    VIDEO = 'video',
+    FILE = 'file',
+    STICKER = 'sticker',
+}
