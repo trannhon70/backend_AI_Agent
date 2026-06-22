@@ -1,9 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { User } from 'src/modules/users/entities/user.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity('fanpages')
 export class Fanpage {
     @PrimaryGeneratedColumn("increment")
     id!: number;
+
+    // Người kết nối fanpage đầu tiên
+    @Column({ nullable: true })
+    user_id!: number | null;
+
+    @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'user_id' })
+    user!: User | null;
 
     // các id của facebook
     @Column({ nullable: true })

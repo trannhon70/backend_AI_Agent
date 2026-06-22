@@ -104,22 +104,38 @@ export class FanPagesConsumer {
                         page_avatar: item.url,
                         access_token: token.access_token,
                         data_access_expires_at: debugToken.data.data_access_expires_at,
+                        user_id: payload.user_id,
                         created_at: currentTimestamp(),
                     });
 
                     await this.pageTokenRepo.save({
-                        page_id: page.id,
+                        fanpage_id: page.id,
                         access_token: item.access_token,
                         created_at: currentTimestamp(),
                     });
                 }
+                // Update lại thông tin page
+                await this.fanpageRepo.update(
+                    { id: page.id },
+                    {
+                        page_name: item.name,
+                        page_avatar: item.url,
+                        access_token: token.access_token,
+                        data_access_expires_at: debugToken.data.data_access_expires_at,
+                    },
+                );
 
-                await this.userPageRepo.save({
+                await this.pageTokenRepo.update({ fanpage_id: page.id }, {
+                    access_token: item.access_token,
+                })
+
+
+                await this.userPageRepo.upsert({
                     user_id: payload.user_id,
-                    page_id: page.id, // ✅ ID trong DB
+                    fanpage_id: page.id, // ✅ ID trong DB
                     provider: item.provider,
                     created_at: currentTimestamp(),
-                });
+                }, { conflictPaths: ["user_id", "fanpage_id"] });
 
                 //subscribed lấy token của page
                 await fetch(

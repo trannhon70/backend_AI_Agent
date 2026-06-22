@@ -1,9 +1,10 @@
 import { Fanpage } from 'src/modules/fanpages/entities/fanpage.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 import { ProviderEnum } from 'src/shared/enums/role.enum';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
 
 @Entity('user_pages')
+@Unique(["user_id", "fanpage_id"])
 export class UserPage {
     @PrimaryGeneratedColumn("increment")
     id!: number;
