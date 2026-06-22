@@ -1,6 +1,6 @@
 // users/users.consumer.ts
 import { Controller, Logger } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { currentTimestamp } from 'src/shared/utils/currentTimestamp';
 import { Repository } from 'typeorm';
@@ -139,6 +139,48 @@ export class FanPagesConsumer {
         } catch (error) {
             this.logger.error('Failed to process user created event', error);
             throw error;
+        }
+    }
+
+    @MessagePattern(DomainEvents.FanPage_tokenRenewal)
+    async handleFanPagestokenRenewad(@Payload() payload: any) {
+        try {
+            console.log(payload, 'payload');
+            // tiến hành long token lên thời gian tối đa khoảng 90 ngày
+            const token = await this.exchangeLongLivedToken(payload.access_token);
+            const debugToken = await this.debugToken(token.access_token);
+            console.log(debugToken, 'debugToken');
+
+            // // ✅ lấy danh sách page kết nối facebook
+            const result = await fetch(
+                'https://graph.facebook.com/v25.0/me/accounts?fields=id,name,category,picture.type(large),access_token',
+                {
+                    headers: {
+                        Authorization: `Bearer ${token.access_token}`, // <-- fix ở đây
+                    },
+                }
+            );
+
+            const fanpages = await result.json();
+            const pages = fanpages?.data?.map((item: any) => ({
+                id: item.id,
+                access_token: item.access_token,
+            }));
+
+            for (const item of pages) {
+
+                await this.fanpageRepo.update({ id: payload.fanpage_id }, {
+                    access_token: token.access_token,
+                    data_access_expires_at: debugToken.data.data_access_expires_at,
+                });
+
+                await this.pageTokenRepo.update({ fanpage_id: payload.fanpage_id }, {
+                    access_token: item.access_token,
+                });
+            }
+
+        } catch (error) {
+            throw error
         }
     }
 

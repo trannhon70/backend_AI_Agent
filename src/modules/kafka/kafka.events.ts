@@ -8,6 +8,7 @@ export enum DomainEvents {
 
     // fanpages
     FanPage_connect_facebook = 'fanPage.connect_facebook',
+    FanPage_tokenRenewal = 'fanPage.tokenRenewal',
 
     //conversation
     conversation_create = 'conversation.create'

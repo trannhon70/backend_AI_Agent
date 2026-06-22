@@ -29,6 +29,22 @@ export class FanpagesController {
     };
   }
 
+  @Post('token-renewal')
+  @UseGuards(JwtAuthGuard)
+  async tokenRenewal(@Req() req: any, @Body() body: any) {
+    const payload = {
+      ...body,
+      user_id: req.user.id
+    }
+
+    const result = await this.kafkaService.send(DomainEvents.FanPage_tokenRenewal, payload);
+    return {
+      statusCode: 1,
+      message: 'tạo mới token thành công!',
+      data: result
+    };
+  }
+
   @Get('get-page-id/:id')
   @UseGuards(JwtAuthGuard)
   async getPageId(@Req() req: any, @Param() param: any) {

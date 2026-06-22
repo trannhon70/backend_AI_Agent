@@ -5,6 +5,7 @@ export class Fanpage {
     @PrimaryGeneratedColumn("increment")
     id!: number;
 
+    // các id của facebook
     @Column({ nullable: true })
     page_id!: string;
 

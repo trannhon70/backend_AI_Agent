@@ -16,10 +16,10 @@ export class UserPage {
     user!: User;
 
     @Column({ nullable: true })
-    page_id!: number;
+    fanpage_id!: number;
 
     @ManyToOne(() => Fanpage)
-    @JoinColumn({ name: 'page_id' })
+    @JoinColumn({ name: 'fanpage_id' })
     page!: Fanpage;
 
     @Column({ type: 'enum', enum: ProviderEnum, default: ProviderEnum.LOCAL })
