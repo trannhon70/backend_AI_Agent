@@ -87,4 +87,12 @@ export class UserPagesService {
     }
   }
 
+  async delete(param: any) {
+    try {
+      return await this.UserPageRepo.delete(param)
+    } catch (error) {
+      throw error
+    }
+  }
+
 }

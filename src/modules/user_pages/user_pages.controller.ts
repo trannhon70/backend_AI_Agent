@@ -32,4 +32,15 @@ export class UserPagesController {
     };
   }
 
+  @Delete('delete/:id')
+  @UseGuards(JwtAuthGuard)
+  async delete(@Req() req: any, @Param() param: any) {
+    const data = await this.userPagesService.delete(param);
+    return {
+      statusCode: 1,
+      message: 'delete user pages success!',
+      data: data
+    };
+  }
+
 }
