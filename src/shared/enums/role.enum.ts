@@ -7,6 +7,12 @@ export enum RoleEnum {
     CSKH = 4,
 }
 
+export enum RoleEnumUserPage {
+    ADMIN_MANAGE = 'Admin Manager',
+    SALE = 'Sale',
+    CSKH = 'CSKH',
+}
+
 export enum ProviderEnum {
     LOCAL = 'local',
     GOOGLE = 'google',

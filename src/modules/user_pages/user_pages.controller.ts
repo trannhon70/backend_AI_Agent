@@ -43,4 +43,15 @@ export class UserPagesController {
     };
   }
 
+  @Post('create')
+  @UseGuards(JwtAuthGuard)
+  async createUserPage(@Req() req: any, @Body() body: any) {
+    const data = await this.userPagesService.createUserPage(body);
+    return {
+      statusCode: 1,
+      message: 'create user pages success!',
+      data: data
+    };
+  }
+
 }

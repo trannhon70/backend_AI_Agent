@@ -1,6 +1,6 @@
 import { Fanpage } from 'src/modules/fanpages/entities/fanpage.entity';
 import { User } from 'src/modules/users/entities/user.entity';
-import { ProviderEnum } from 'src/shared/enums/role.enum';
+import { ProviderEnum, RoleEnumUserPage } from 'src/shared/enums/role.enum';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
 
 @Entity('user_pages')
@@ -25,6 +25,10 @@ export class UserPage {
 
     @Column({ type: 'enum', enum: ProviderEnum, default: ProviderEnum.LOCAL })
     provider!: ProviderEnum;
+
+    // user được kết nối vào page với quyền
+    @Column({ type: 'enum', enum: RoleEnumUserPage, default: RoleEnumUserPage.ADMIN_MANAGE })
+    role!: RoleEnumUserPage;
 
     @Column({ nullable: true })
     created_at!: number;

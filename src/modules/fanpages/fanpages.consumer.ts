@@ -10,7 +10,7 @@ import { RedisService } from '../redis/redis.service';
 import { UserPage } from '../user_pages/entities/user_page.entity';
 import { Fanpage } from './entities/fanpage.entity';
 import { FanPagesRepository } from './fanpages.repository';
-import { ProviderEnum } from 'src/shared/enums/role.enum';
+import { ProviderEnum, RoleEnumUserPage } from 'src/shared/enums/role.enum';
 
 @Controller()
 export class FanPagesConsumer {
@@ -82,6 +82,7 @@ export class FanPagesConsumer {
             );
 
             const fanpages = await result.json();
+
             const pages = fanpages?.data?.map((item: any) => ({
                 id: item.id,
                 name: item.name,
@@ -134,6 +135,7 @@ export class FanPagesConsumer {
                     user_id: payload.user_id,
                     fanpage_id: page.id, // ✅ ID trong DB
                     provider: item.provider,
+                    role: RoleEnumUserPage.ADMIN_MANAGE,
                     created_at: currentTimestamp(),
                 }, { conflictPaths: ["user_id", "fanpage_id"] });
 
