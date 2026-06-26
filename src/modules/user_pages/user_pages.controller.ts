@@ -54,4 +54,14 @@ export class UserPagesController {
     };
   }
 
+  @Get('get-paging-user-page-active')
+  @UseGuards(JwtAuthGuard)
+  async getPagingUserPageActive(@Req() req: any, @Query() query: any) {
+    const data = await this.userPagesService.getPagingUserPageActive(req.user.id, query);
+    return {
+      statusCode: 1,
+      message: 'get paging user pages success!',
+      data: data
+    };
+  }
 }

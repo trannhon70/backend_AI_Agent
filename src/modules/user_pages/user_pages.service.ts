@@ -139,4 +139,52 @@ export class UserPagesService {
     }
   }
 
+  async getPagingUserPageActive(user_id: number, query: any) {
+    try {
+      const pageIndex = query.pageIndex ? parseInt(query.pageIndex, 10) : 1;
+      const pageSize = query.pageSize ? parseInt(query.pageSize, 10) : 10;
+      const search = query.search || '';
+      const page_id = query.page_id || '';
+      const skip = (pageIndex - 1) * pageSize;
+      const fanpage = await this.fanpageRepo.findOneByOrFail({ page_id });
+
+      const qb = this.UserPageRepo.createQueryBuilder('user_page')
+        .leftJoinAndSelect('user_page.user', 'user')
+        .select('user_page')
+        .addSelect([
+          'user.id',
+          'user.email',
+          'user.full_name',
+          'user.avatar',
+        ])
+        .skip(skip)
+        .take(pageSize)
+        .orderBy('user_page.id', 'DESC');
+
+      if (fanpage.id) {
+        qb.andWhere('user_page.fanpage_id = :fanpage_id', {
+          fanpage_id: fanpage.id,
+        });
+      }
+
+      if (search) {
+        qb.andWhere('user.email ILIKE :search OR user.full_name ILIKE :search', {
+          search: `%${search}%`,
+        });
+      }
+
+      const [result, total] = await qb.getManyAndCount();
+      return {
+        data: result,
+        total: total,
+        pageIndex: pageIndex,
+        pageSize: pageSize,
+        totalPages: Math.ceil(total / pageSize),
+
+      };
+    } catch (error) {
+      console.log(error);
+      throw error
+    }
+  }
 }

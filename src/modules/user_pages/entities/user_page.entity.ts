@@ -1,8 +1,10 @@
 import { Fanpage } from 'src/modules/fanpages/entities/fanpage.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 import { ProviderEnum, RoleEnumUserPage } from 'src/shared/enums/role.enum';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique, Index } from 'typeorm';
 
+@Index('idx_user_page_fanpage', ['fanpage_id'])
+@Index('idx_user_page_user', ['user_id'])
 @Entity('user_pages')
 @Unique(["user_id", "fanpage_id"])
 export class UserPage {
