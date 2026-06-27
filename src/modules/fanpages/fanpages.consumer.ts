@@ -295,17 +295,17 @@ export class FanPagesConsumer {
                 const save_message = message.data.map((item: any) => {
                     const sender_id = item.from?.id;
                     const recipient_id = item.to?.data?.[0]?.id;
-                    const direction = String(sender_id) === String(customer.id) ? MessageDirection.STAFF : MessageDirection.CUSTOMER;
+                    const direction = String(sender_id) === String(customer.id) ? MessageDirection.CUSTOMER : MessageDirection.STAFF;
                     let type = MessageType.TEXT;
 
                     if (item.attachments?.data?.length) {
                         const attachment = item.attachments.data[0];
 
-                        if (attachment.mime_type?.startsWith('image')) {
+                        if (attachment.mime_type?.startsWith("image")) {
                             type = MessageType.IMAGE;
-                        } else if (attachment.mime_type?.startsWith('video')) {
+                        } else if (attachment.mime_type?.startsWith("video")) {
                             type = MessageType.VIDEO;
-                        } else if (attachment.mime_type?.startsWith('audio')) {
+                        } else if (attachment.mime_type?.startsWith("audio")) {
                             type = MessageType.AUDIO;
                         } else {
                             type = MessageType.FILE;
@@ -317,6 +317,7 @@ export class FanPagesConsumer {
                         sender_id: sender_id,
                         recipient_id: recipient_id,
                         direction: direction,
+                        type,
                         text: item.message ?? null,
                         attachments: item.attachments?.data ?? null,
                         raw_data: item,
