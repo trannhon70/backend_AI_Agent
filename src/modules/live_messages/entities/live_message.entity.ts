@@ -6,7 +6,6 @@ import {
     ManyToOne, JoinColumn, Index
 } from 'typeorm';
 
-
 @Entity('live_messages')
 export class LiveMessage {
 

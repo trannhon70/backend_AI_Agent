@@ -1,34 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
 import { LiveMessagesService } from './live_messages.service';
 import { CreateLiveMessageDto } from './dto/create-live_message.dto';
 import { UpdateLiveMessageDto } from './dto/update-live_message.dto';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @Controller('live-messages')
 export class LiveMessagesController {
-  constructor(private readonly liveMessagesService: LiveMessagesService) {}
+  constructor(
+    private readonly liveMessagesService: LiveMessagesService
+  ) { }
 
-  @Post()
-  create(@Body() createLiveMessageDto: CreateLiveMessageDto) {
-    return this.liveMessagesService.create(createLiveMessageDto);
+  @Get('get-paging')
+  @UseGuards(JwtAuthGuard)
+  async getPagging(@Req() req: any, @Query() query: any) {
+    const result = await this.liveMessagesService.getPagging(req.user.id, query)
+    return {
+      statusCode: 1,
+      message: 'getpaging messages success!',
+      data: result
+    };
   }
 
-  @Get()
-  findAll() {
-    return this.liveMessagesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.liveMessagesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLiveMessageDto: UpdateLiveMessageDto) {
-    return this.liveMessagesService.update(+id, updateLiveMessageDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.liveMessagesService.remove(+id);
-  }
 }
