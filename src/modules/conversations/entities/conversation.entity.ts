@@ -28,6 +28,10 @@ export class Conversation {
     @Column({ nullable: true })
     customer_id!: string;
 
+    //tên khách hàng
+    @Column({ nullable: true })
+    full_name!: string;
+
     // last_message tin nhắn mới nhất
     @Column({ nullable: true })
     last_message_id!: number | null;
@@ -40,8 +44,12 @@ export class Conversation {
     last_message_at!: number | null;
 
     //Số tin nhắn chưa đọc từ phía khách hàng gửi vào
-    @Column({ nullable: true })
+    @Column({ nullable: true, default: 0 })
     unread_count!: number;
+
+    //hình ảnh 
+    @Column({ nullable: true, type: "text" })
+    avatar!: string;
 
     //Thời điểm cuộc hội thoại được tạo lần đầu
     @Column({ type: 'float', nullable: true })

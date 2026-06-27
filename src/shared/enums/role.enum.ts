@@ -22,8 +22,10 @@ export enum ProviderEnum {
 }
 
 export enum MessageDirection {
-    INBOUND = 'inbound',   // khách gửi vào
-    OUTBOUND = 'outbound', // agent/bot gửi ra
+    STAFF = 'staff',   // tin nhắn từ nhân viên
+    CUSTOMER = 'customer', //tin nhắn từ khách hàng
+    AUTO = 'auto', // tin nhắn auto
+    AI = 'ai', // AI trả lời
 }
 
 export enum MessageType {

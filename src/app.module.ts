@@ -20,9 +20,11 @@ import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { FanpagesModule } from './modules/fanpages/fanpages.module';
 import { UserPagesModule } from './modules/user_pages/user_pages.module';
 import { PageTokensModule } from './modules/page_tokens/page_tokens.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true, // cực kỳ quan trọng
     }),

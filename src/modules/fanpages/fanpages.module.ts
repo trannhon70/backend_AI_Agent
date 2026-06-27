@@ -7,10 +7,12 @@ import { FanPagesRepository } from './fanpages.repository';
 import { FanPagesConsumer } from './fanpages.consumer';
 import { PageToken } from '../page_tokens/entities/page_token.entity';
 import { UserPage } from '../user_pages/entities/user_page.entity';
+import { Conversation } from '../conversations/entities/conversation.entity';
+import { LiveMessage } from '../live_messages/entities/live_message.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Fanpage, PageToken, UserPage]),
+    TypeOrmModule.forFeature([Fanpage, PageToken, UserPage, Conversation, LiveMessage]),
   ],
   controllers: [FanpagesController, FanPagesConsumer],
   providers: [FanpagesService, FanPagesRepository],

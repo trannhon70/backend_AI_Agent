@@ -1,5 +1,11 @@
 import { User } from 'src/modules/users/entities/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+export enum SyncStatus {
+    PENDING = 'pending', //Chưa đồng bộ
+    SYNCING = 'syncing', //Đang đồng bộ...
+    SUCCESS = 'success', // Đồng bộ thành công
+    FAILED = 'failed',//  Đồng bộ thất bại
+}
 
 @Entity('fanpages')
 export class Fanpage {
@@ -30,6 +36,15 @@ export class Fanpage {
     //thời điểm quyền truy cập dữ liệu của người dùng sẽ hết hiệu lực nếu người dùng không tiếp tục sử dụng hoặc gia hạn quyền cho ứng dụng
     @Column({ type: 'float', nullable: true })
     data_access_expires_at!: number | null;
+
+    //tình trang fanpage đã được đồng bộ tin nhắn chưa
+    @Column({
+        type: 'enum',
+        enum: SyncStatus,
+        default: SyncStatus.PENDING,
+    })
+    syncStatus!: SyncStatus;
+
 
     @Column({ nullable: true })
     created_at!: number;

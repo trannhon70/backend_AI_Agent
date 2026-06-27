@@ -63,7 +63,7 @@ export class ConversationsConsumer {
                         facebook_mid: event.message.mid,
                         sender_id: event.sender.id,
                         recipient_id: event.recipient.id,
-                        direction: MessageDirection.INBOUND,
+                        direction: MessageDirection.STAFF,
                         type: MessageType.TEXT,
                         text: event.message.text,
                         attachments: event.message.attachments,

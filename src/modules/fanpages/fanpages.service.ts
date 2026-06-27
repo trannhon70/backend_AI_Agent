@@ -18,7 +18,16 @@ export class FanpagesService {
   ) { }
   async getPageId(user_id: number, param: any) {
     try {
-      return await this.fanpageRepo.findOne({ where: { page_id: param.id } })
+      // const cacheKey = `page_id:${param.id}`;
+
+      // const cache = await this.redisService.get(cacheKey);
+      // if (cache) {
+      //   return cache;
+      // }
+      const result = await this.fanpageRepo.findOne({ where: { page_id: param.id } })
+      //Lưu redis 8 tiếng
+      // await this.redisService.set(cacheKey, result, 28800);
+      return result
     } catch (error) {
       throw error
     }

@@ -5,12 +5,14 @@ import { UpdateFanpageDto } from './dto/update-fanpage.dto';
 import { KafkaService } from '../kafka/kafka.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { DomainEvents } from '../kafka/kafka.events';
+import { SocketService } from '../socket/socket.service';
 
 @Controller('fanpages')
 export class FanpagesController {
   constructor(
     private readonly kafkaService: KafkaService,
-    private readonly fanpagesService: FanpagesService
+    private readonly fanpagesService: FanpagesService,
+    private readonly socketService: SocketService,
   ) { }
 
   @Post('connect-page-facebook')
@@ -51,6 +53,20 @@ export class FanpagesController {
 
     const result = await this.fanpagesService.getPageId(req.user.id, param)
 
+    return {
+      statusCode: 1,
+      message: 'get page_id success!',
+      data: result
+    };
+  }
+
+  //đồng bọ tin nhắn
+  @Post('syncing')
+  @UseGuards(JwtAuthGuard)
+  async syncing(@Req() req: any, @Body() payload: any) {
+    // this.socketService.emitToAll('syncStatus', payload);
+    // return
+    const result = await this.kafkaService.send(DomainEvents.FanPage_syncing, payload);
     return {
       statusCode: 1,
       message: 'get page_id success!',

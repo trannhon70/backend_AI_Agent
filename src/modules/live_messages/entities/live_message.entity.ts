@@ -40,7 +40,7 @@ export class LiveMessage {
     @Column({
         type: 'enum',
         enum: MessageDirection,
-        default: MessageDirection.INBOUND,
+        default: MessageDirection.AUTO,
     })
     direction!: MessageDirection;
 
