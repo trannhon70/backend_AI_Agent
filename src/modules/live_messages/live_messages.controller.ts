@@ -1,8 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
-import { LiveMessagesService } from './live_messages.service';
-import { CreateLiveMessageDto } from './dto/create-live_message.dto';
-import { UpdateLiveMessageDto } from './dto/update-live_message.dto';
+import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { LiveMessagesService } from './live_messages.service';
 
 @Controller('live-messages')
 export class LiveMessagesController {
