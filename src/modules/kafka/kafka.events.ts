@@ -13,5 +13,6 @@ export enum DomainEvents {
     FanPage_sync_socket = 'fanPage.sync_soket',
 
     //conversation
-    conversation_create = 'conversation.create'
+    conversation_create = 'conversation.create',
+    conversation_socket_message = 'conversation.socket_message'
 }

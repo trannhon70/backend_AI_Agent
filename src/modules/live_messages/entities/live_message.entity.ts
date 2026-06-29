@@ -1,6 +1,7 @@
 import { Conversation } from 'src/modules/conversations/entities/conversation.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 import { MessageDirection, MessageType } from 'src/shared/enums/role.enum';
+import { NormalizedAttachment } from 'src/shared/interfaces';
 import {
     Entity, PrimaryGeneratedColumn, Column,
     ManyToOne, JoinColumn, Index
@@ -57,7 +58,7 @@ export class LiveMessage {
 
     // 📎 Attachments (image, file, audio...)
     @Column({ type: 'jsonb', nullable: true })
-    attachments!: object[] | null;
+    attachments!: NormalizedAttachment[];
 
     // 🗃 Raw payload từ Facebook webhook - để debug
     @Column({ type: 'jsonb', nullable: true })

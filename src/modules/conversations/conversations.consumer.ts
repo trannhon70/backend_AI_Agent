@@ -9,6 +9,8 @@ import { Conversation } from './entities/conversation.entity';
 import { ConversationsRepository } from './conversations.repository';
 import { LiveMessage } from '../live_messages/entities/live_message.entity';
 import { MessageDirection, MessageType } from 'src/shared/enums/role.enum';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { normalizeAttachments } from 'src/shared/utils';
 
 let saltOrRounds = 10;
 @Controller()
@@ -21,6 +23,8 @@ export class ConversationsConsumer {
 
         @InjectRepository(LiveMessage)
         private readonly LiveMessageRepo: Repository<LiveMessage>,
+
+        private readonly eventEmitter: EventEmitter2,
     ) { }
 
     async findOrCreateConversation(
@@ -31,7 +35,6 @@ export class ConversationsConsumer {
             {
                 page_id: pageId,
                 customer_id: customerId,
-                unread_count: 0,
                 created_at: currentTimestamp(),
                 updated_at: currentTimestamp(),
             },
@@ -55,22 +58,41 @@ export class ConversationsConsumer {
             for (const entry of payload) {
                 const pageId = entry.id;
                 for (const event of entry.messaging) {
-                    const conversation = await this.findOrCreateConversation(pageId, event.sender.id);
+                    const sender_id = event.sender.id;
+                    const recipient_id = event.recipient.id;
+                    let type = MessageType.TEXT;
 
-                    // lưu message
-                    const savedMessage = await this.LiveMessageRepo.save({
+                    if (event.message.attachments?.length) {
+                        const attachment = event.message.attachments[0];
+
+                        if (attachment.type?.startsWith("image")) {
+                            type = MessageType.IMAGE;
+                        } else if (attachment.type?.startsWith("video")) {
+                            type = MessageType.VIDEO;
+                        } else if (attachment.type?.startsWith("audio")) {
+                            type = MessageType.AUDIO;
+                        } else {
+                            type = MessageType.FILE;
+                        }
+                    }
+
+                    const conversation = await this.findOrCreateConversation(pageId, sender_id);
+                    const data_mess = {
                         conversation_id: conversation.id,
                         facebook_mid: event.message.mid,
-                        sender_id: event.sender.id,
-                        recipient_id: event.recipient.id,
-                        direction: MessageDirection.STAFF,
-                        type: MessageType.TEXT,
+                        sender_id: sender_id,
+                        recipient_id: recipient_id,
+                        direction: MessageDirection.CUSTOMER,
+                        type: type,
                         text: event.message.text,
-                        attachments: event.message.attachments,
+                        attachments: normalizeAttachments(event.message.attachments, 'webhook'),
                         raw_data: event,
                         sent_at: event.timestamp,
                         created_at: currentTimestamp(),
-                    });
+                    }
+                    // lưu message và thực hiện socket
+                    this.eventEmitter.emit(DomainEvents.conversation_socket_message, { page_id: conversation.id, data_mess });
+                    const savedMessage = await this.LiveMessageRepo.save(data_mess);
 
                     // update conversation
                     await this.ConversationRepo.update(

@@ -14,7 +14,7 @@ import { RedisService } from '../redis/redis.service';
 import { UserPage } from '../user_pages/entities/user_page.entity';
 import { Fanpage, SyncStatus } from './entities/fanpage.entity';
 import { FanPagesRepository } from './fanpages.repository';
-import { toUnixTimestamp } from 'src/shared/utils';
+import { normalizeAttachments, toUnixTimestamp } from 'src/shared/utils';
 
 @Controller()
 export class FanPagesConsumer {
@@ -319,7 +319,7 @@ export class FanPagesConsumer {
                         direction: direction,
                         type,
                         text: item.message ?? null,
-                        attachments: item.attachments?.data ?? null,
+                        attachments: normalizeAttachments(item.attachments?.data, 'sync'),
                         raw_data: item,
                         user_id: null,
                         sent_at: toUnixTimestamp(item.created_time),

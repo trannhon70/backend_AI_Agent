@@ -44,12 +44,13 @@ export class LiveMessagesService {
           'conversation.avatar',
           'user.id',
           'user.full_name',
+          'user.avatar',
         ])
         .where('message.conversation_id = :conversation_id', { conversation_id })
 
         .skip(skip)
         .take(pageSize)
-        .orderBy('message.id', 'DESC');
+        .orderBy('message.id', 'ASC');
 
 
       if (search) {
