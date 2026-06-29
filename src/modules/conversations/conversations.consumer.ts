@@ -106,6 +106,7 @@ export class ConversationsConsumer {
                         where: {
                             id: conversation.id,
                         },
+                        relations: ['lastMessage'],
                     });
                     // lưu message và thực hiện socket
                     this.eventEmitter.emit(DomainEvents.conversation_socket_message, { page_id: conversation.id, message: data_mess, conversation: updatedConversation });
