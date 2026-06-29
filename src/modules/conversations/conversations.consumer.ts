@@ -90,8 +90,6 @@ export class ConversationsConsumer {
                         sent_at: event.timestamp,
                         created_at: currentTimestamp(),
                     }
-                    // lưu message và thực hiện socket
-                    this.eventEmitter.emit(DomainEvents.conversation_socket_message, { page_id: conversation.id, data_mess });
                     const savedMessage = await this.LiveMessageRepo.save(data_mess);
 
                     // update conversation
@@ -104,6 +102,13 @@ export class ConversationsConsumer {
                             unread_count: () => `"unread_count" + 1`,
                         },
                     );
+                    const updatedConversation = await this.ConversationRepo.findOne({
+                        where: {
+                            id: conversation.id,
+                        },
+                    });
+                    // lưu message và thực hiện socket
+                    this.eventEmitter.emit(DomainEvents.conversation_socket_message, { page_id: conversation.id, message: data_mess, conversation: updatedConversation });
                 }
             }
         } catch (error) {

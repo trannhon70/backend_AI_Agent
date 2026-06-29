@@ -292,7 +292,7 @@ export class FanPagesConsumer {
 
                 const message = await response_message.json();
 
-                const save_message = message.data.map((item: any) => {
+                const save_message = message.data.reverse().map((item: any) => {
                     const sender_id = item.from?.id;
                     const recipient_id = item.to?.data?.[0]?.id;
                     const direction = String(sender_id) === String(customer.id) ? MessageDirection.CUSTOMER : MessageDirection.STAFF;
