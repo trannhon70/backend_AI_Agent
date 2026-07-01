@@ -17,37 +17,39 @@ export class ConversationsService {
 
     async getPagging(user_id: number, query: any) {
         try {
-
             const pageSize = query.pageSize ? parseInt(query.pageSize, 10) : 10;
             const search = query.search || '';
             const page_id = query.page_id || '';
             const lastId = query.lastId ? Number(query.lastId) : undefined;
 
-            const qb = this.conversationRepo.createQueryBuilder('conversation')
-                .leftJoin('conversation.lastMessage', 'lastMessage')
-                // .where('conversation.page_id = :page_id', { page_id })
-                .addSelect(['lastMessage.id', 'lastMessage.text', 'lastMessage.type'])
-                .orderBy('conversation.id', 'DESC')
-                .take(pageSize)
-
+            const qb = this.conversationRepo
+                .createQueryBuilder('conversation')
+                .where('conversation.page_id = :page_id', { page_id });
 
             if (search) {
-                qb.andWhere(`conversation.search_vector @@ plainto_tsquery('simple', :search)`,
-                    {
-                        search,
-                    },
-                );
+                qb.andWhere(`conversation.search_vector @@plainto_tsquery('simple', unaccent(:search))`, { search });
             }
 
-            if (lastId !== undefined) {
+            if (lastId) {
                 qb.andWhere('conversation.id < :lastId', { lastId });
             }
 
+            qb.leftJoin('conversation.lastMessage', 'lastMessage')
+                .addSelect([
+                    'lastMessage.id',
+                    'lastMessage.text',
+                    'lastMessage.type'
+                ])
+                .orderBy('conversation.id', 'DESC')
+                .take(pageSize);
+
             const result = await qb.getMany();
             return {
-                data: result,
+                length: result.length,
                 hasMore: result.length === pageSize,
                 lastId: result[result.length - 1]?.id,
+                data: result,
+
             };
         } catch (error) {
             throw error
@@ -56,8 +58,8 @@ export class ConversationsService {
 
     async createTest() {
         try {
-            const TOTAL = 5000000;
-            const BATCH_SIZE = 100000;
+            const TOTAL = 10000000;
+            const BATCH_SIZE = 500000;
 
             const now = Date.now() / 1000;
 
@@ -84,7 +86,7 @@ export class ConversationsService {
                     const safeText = r.full_name.replace(/'/g, "''");
 
                     return `(
-                    '${r.page_id}',
+                    '895158190356147',
                     '${r.customer_id}',
                     '${safeText}',
                     ${r.last_message_id ?? null},
@@ -92,8 +94,8 @@ export class ConversationsService {
                     ${r.unread_count},
                     '${r.avatar ?? ''}',
                     ${now},
-                    ${now},
-                    to_tsvector('simple', '${safeText}')
+                    ${now}
+                  
                 )`;
                 });
 
@@ -108,8 +110,7 @@ export class ConversationsService {
                     unread_count,
                     avatar,
                     created_at,
-                    updated_at,
-                    search_vector
+                    updated_at
                 )
                 VALUES ${values.join(',')}
                 ON CONFLICT (page_id, customer_id)

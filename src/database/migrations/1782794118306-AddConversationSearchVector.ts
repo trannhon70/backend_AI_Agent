@@ -4,57 +4,63 @@ export class AddConversationSearchVector1782794118306 implements MigrationInterf
 
     public async up(queryRunner: QueryRunner): Promise<void> {
 
-        // 1. Enable extension for Vietnamese search improvement
+        // Enable extension
         await queryRunner.query(`
             CREATE EXTENSION IF NOT EXISTS unaccent;
         `);
 
-        // 2. Add column
+        // Add search_vector column
         await queryRunner.query(`
             ALTER TABLE conversations
             ADD COLUMN search_vector tsvector;
         `);
 
-        // 3. Backfill OLD data (IMPORTANT)
+        // Backfill existing data
         await queryRunner.query(`
             UPDATE conversations
-            SET search_vector =
-                to_tsvector(
-                    'simple',
-                    unaccent(
-                        coalesce(full_name,'')
-                    )
-                );
+            SET search_vector = to_tsvector(
+                'simple',
+                unaccent(
+                    coalesce(full_name, '')
+                )
+            );
         `);
 
-        // 4. Create GIN index
+        // GIN index for Full Text Search
         await queryRunner.query(`
-            CREATE INDEX conversation_search_idx
+            CREATE INDEX IF NOT EXISTS conversation_search_idx
             ON conversations
             USING GIN(search_vector);
         `);
 
-        // 5. Create function (multi-field ready)
+        // Composite index for cursor pagination
         await queryRunner.query(`
-            CREATE FUNCTION conversation_search_vector_update()
+            CREATE INDEX IF NOT EXISTS idx_conversation_page_id_id
+            ON conversations(page_id, id DESC);
+        `);
+
+        // Trigger function
+        await queryRunner.query(`
+            CREATE OR REPLACE FUNCTION conversation_search_vector_update()
             RETURNS trigger AS $$
             BEGIN
                 NEW.search_vector :=
                     to_tsvector(
                         'simple',
                         unaccent(
-                            coalesce(NEW.full_name,'')
+                            coalesce(NEW.full_name, '')
                         )
                     );
+
                 RETURN NEW;
-            END
+            END;
             $$ LANGUAGE plpgsql;
         `);
 
-        // 6. Create trigger
+        // Trigger
         await queryRunner.query(`
             CREATE TRIGGER conversation_search_trigger
-            BEFORE INSERT OR UPDATE
+            BEFORE INSERT OR UPDATE OF full_name
             ON conversations
             FOR EACH ROW
             EXECUTE FUNCTION conversation_search_vector_update();
@@ -70,6 +76,10 @@ export class AddConversationSearchVector1782794118306 implements MigrationInterf
 
         await queryRunner.query(`
             DROP FUNCTION IF EXISTS conversation_search_vector_update;
+        `);
+
+        await queryRunner.query(`
+            DROP INDEX IF EXISTS idx_conversation_page_id_id;
         `);
 
         await queryRunner.query(`

@@ -157,7 +157,10 @@ https://developers.facebook.com/apps/
 ## Thêm cột search_vector
 npm run typeorm migration:create src/database/migrations/AddConversationSearchVector
 
+## revert lại migration
+npm run typeorm -- migration:revert -d src/database/data-source.ts
 ## lệnh chạy migration
 npm run typeorm migration:run -- -d src/database/data-source.ts
 
-## lệnh xóa
+## 1. Xem toàn bộ index của 1 bảng
+SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'conversations';
