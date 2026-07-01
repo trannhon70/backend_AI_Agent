@@ -1,5 +1,5 @@
 import { User } from 'src/modules/users/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
 export enum SyncStatus {
     PENDING = 'pending', //Chưa đồng bộ
     SYNCING = 'syncing', //Đang đồng bộ...
@@ -8,6 +8,7 @@ export enum SyncStatus {
 }
 
 @Entity('fanpages')
+@Unique(['page_id'])
 export class Fanpage {
     @PrimaryGeneratedColumn("increment")
     id!: number;

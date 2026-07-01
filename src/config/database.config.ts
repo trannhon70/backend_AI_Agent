@@ -11,8 +11,9 @@ export const getDatabaseConfig = (
     password: configService.get<string>('DB_PASSWORD'),
     database: configService.get<string>('DB_NAME'),
     autoLoadEntities: true,
-    synchronize: false,
-
+    synchronize: false, // Set to false in production
+    migrationsRun: true,
+    migrations: [__dirname + '/migrations/*{.ts,.js}'],
     extra: {
         // max: 10,
     },

@@ -64,8 +64,6 @@ export class FanpagesController {
   @Post('syncing')
   @UseGuards(JwtAuthGuard)
   async syncing(@Req() req: any, @Body() payload: any) {
-    // this.socketService.emitToAll('syncStatus', payload);
-    // return
     const result = await this.kafkaService.send(DomainEvents.FanPage_syncing, payload);
     return {
       statusCode: 1,
@@ -74,5 +72,16 @@ export class FanpagesController {
     };
   }
 
+  //đồng bọ tin nhắn
+  @Post('create-test')
+  async createTest() {
+    const result = await this.fanpagesService.createTest()
+
+    return {
+      statusCode: 1,
+      message: 'create test success!',
+      data: result
+    };
+  }
 
 }
