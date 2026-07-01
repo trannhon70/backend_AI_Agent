@@ -17,7 +17,7 @@ export class ConversationsService {
 
     async getPagging(user_id: number, query: any) {
         try {
-            const pageSize = query.pageSize ? parseInt(query.pageSize, 10) : 10;
+            const limit = query.limit ? parseInt(query.limit, 10) : 10;
             const search = query.search || '';
             const page_id = query.page_id || '';
             const lastId = query.lastId ? Number(query.lastId) : undefined;
@@ -41,12 +41,12 @@ export class ConversationsService {
                     'lastMessage.type'
                 ])
                 .orderBy('conversation.id', 'DESC')
-                .take(pageSize);
+                .take(limit);
 
             const result = await qb.getMany();
             return {
-                length: result.length,
-                hasMore: result.length === pageSize,
+                limit: limit,
+                hasMore: result.length === limit,
                 lastId: result[result.length - 1]?.id,
                 data: result,
 
