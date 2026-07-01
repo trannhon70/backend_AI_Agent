@@ -18,9 +18,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "start:pm2": "pm2 start dist/main.js --name backend_live_chat_new",
-    "restart:pm2": "pm2 restart backend_live_chat_new",
-    "seed": "ts-node -r tsconfig-paths/register src/database/seeders/seeds.ts"
+    "seed": "ts-node -r tsconfig-paths/register src/database/seeders/seeds.ts",
+    "typeorm": "node -r tsconfig-paths/register ./node_modules/typeorm/cli-ts-node-commonjs.js"
   },
   "dependencies": {
     "@faker-js/faker": "^10.4.0",

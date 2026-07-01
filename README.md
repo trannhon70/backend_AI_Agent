@@ -153,3 +153,11 @@ https://console.cloud.google.com/apis/credentials?project=onbai-449403
 
 ## doc facebook
 https://developers.facebook.com/apps/
+
+## Thêm cột search_vector
+npm run typeorm migration:create src/database/migrations/AddConversationSearchVector
+
+## lệnh chạy migration
+npm run typeorm migration:run -- -d src/database/data-source.ts
+
+## lệnh xóa

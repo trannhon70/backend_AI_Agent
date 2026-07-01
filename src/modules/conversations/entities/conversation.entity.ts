@@ -51,6 +51,13 @@ export class Conversation {
     @Column({ nullable: true, type: "text" })
     avatar!: string;
 
+    @Column({
+        type: 'tsvector',
+        nullable: true,
+        select: false,
+    })
+    search_vector!: string;
+
     //Thời điểm cuộc hội thoại được tạo lần đầu
     @Column({ type: 'float', nullable: true })
     created_at!: number | null;
