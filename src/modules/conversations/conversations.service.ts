@@ -30,9 +30,9 @@ export class ConversationsService {
                 qb.andWhere(`conversation.search_vector @@plainto_tsquery('simple', unaccent(:search))`, { search });
             }
 
-            if (lastId) {
-                qb.andWhere('conversation.id < :lastId', { lastId });
-            }
+            // if (lastId) {
+            //     qb.andWhere('conversation.id < :lastId', { lastId });
+            // }
 
             qb.leftJoin('conversation.lastMessage', 'lastMessage')
                 .addSelect([
@@ -40,7 +40,7 @@ export class ConversationsService {
                     'lastMessage.text',
                     'lastMessage.type'
                 ])
-                .orderBy('conversation.id', 'DESC')
+                .orderBy('conversation.updated_at', 'DESC')
                 .take(limit);
 
             const result = await qb.getMany();

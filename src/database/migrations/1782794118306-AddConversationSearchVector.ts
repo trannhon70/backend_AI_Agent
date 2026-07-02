@@ -35,8 +35,8 @@ export class AddConversationSearchVector1782794118306 implements MigrationInterf
 
         // Composite index for cursor pagination
         await queryRunner.query(`
-            CREATE INDEX IF NOT EXISTS idx_conversation_page_id_id
-            ON conversations(page_id, id DESC);
+            CREATE INDEX IF NOT EXISTS idx_conversation_page_updated_at_id
+            ON conversations(page_id, updated_at, id DESC);
         `);
 
         // Trigger function
@@ -79,7 +79,7 @@ export class AddConversationSearchVector1782794118306 implements MigrationInterf
         `);
 
         await queryRunner.query(`
-            DROP INDEX IF EXISTS idx_conversation_page_id_id;
+            DROP INDEX IF EXISTS idx_conversation_page_updated_at_id;
         `);
 
         await queryRunner.query(`

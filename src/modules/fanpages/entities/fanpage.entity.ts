@@ -8,7 +8,6 @@ export enum SyncStatus {
 }
 
 @Entity('fanpages')
-@Unique(['page_id'])
 export class Fanpage {
     @PrimaryGeneratedColumn("increment")
     id!: number;
