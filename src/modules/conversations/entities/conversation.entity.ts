@@ -1,9 +1,10 @@
 import { LiveMessage } from "src/modules/live_messages/entities/live_message.entity";
 import { User } from "src/modules/users/entities/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 
 @Entity('conversations')
 @Unique(['page_id', 'customer_id'])
+@Index('idx_conversation_page_updated_at_id', ['page_id', 'updated_at', 'id'])
 export class Conversation {
     @PrimaryGeneratedColumn()
     id!: number;
