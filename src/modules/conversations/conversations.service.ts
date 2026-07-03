@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RedisService } from '../redis/redis.service';
 import { Conversation } from './entities/conversation.entity';
+import { GetConversationsDto } from './dto/conversation.dto';
 
 @Injectable()
 export class ConversationsService {
@@ -15,50 +16,54 @@ export class ConversationsService {
         private readonly redisService: RedisService,
     ) { }
 
-    async getPagging(user_id: number, query: any) {
-        try {
-            const limit = Math.min(query.limit ? parseInt(query.limit, 10) : 10, 100000);
-            const pageIndex = Math.max(query.pageIndex ? parseInt(query.pageIndex, 10) : 1, 1);
-            const search = query.search || '';
-            const page_id = query.page_id || '';
+    async getPagging(query: GetConversationsDto) {
+        const limit = query.limit ? parseInt(query.limit as any, 10) : 10;
+        const search = query.search?.trim() || '';
+        const page_id = query.page_id || '';
+        const lastId = query.lastId ? Number(query.lastId) : undefined;
+        const lastUpdatedAt = query.lastUpdatedAt || undefined;
 
-            const skip = (pageIndex - 1) * limit;
-            const baseQb = this.conversationRepo
-                .createQueryBuilder('conversation')
-                .where('conversation.page_id = :page_id', { page_id });
+        const qb = this.conversationRepo
+            .createQueryBuilder('conversation')
+            .select([
+                'conversation.id',
+                'conversation.page_id',
+                'conversation.full_name',
+                'conversation.updated_at',
+                'conversation.unread_count',
+            ])
+            .where('conversation.page_id = :page_id', { page_id });
 
-            if (search) {
-                baseQb.andWhere(
-                    `conversation.search_vector @@ websearch_to_tsquery('simple', unaccent(:search))`,
-                    { search }
-                );
-            }
-
-            const total = await baseQb.getCount();
-
-            const result = await baseQb
-                .clone()
-                .leftJoin('conversation.lastMessage', 'lastMessage')
-                .addSelect([
-                    'lastMessage.id',
-                    'lastMessage.text',
-                    'lastMessage.type'
-                ])
-                .orderBy('conversation.updated_at', 'DESC')
-                .addOrderBy('conversation.id', 'DESC')
-                .skip(skip)
-                .take(limit)
-                .getMany();
-            return {
-                limit,
-                pageIndex,
-                total,
-                totalPages: Math.ceil(total / limit),
-                data: result,
-            };
-        } catch (error) {
-            throw error
+        if (search) {
+            qb.andWhere(
+                `conversation.search_vector @@ websearch_to_tsquery('simple', unaccent(:search))`,
+                { search },
+            );
         }
+
+        if (lastId && lastUpdatedAt) {
+            qb.andWhere(
+                '(conversation.updated_at, conversation.id) < (:lastUpdatedAt, :lastId)',
+                { lastUpdatedAt, lastId },
+            );
+        }
+
+        qb.leftJoin('conversation.lastMessage', 'lastMessage')
+            .addSelect(['lastMessage.id', 'lastMessage.text', 'lastMessage.type'])
+            .orderBy('conversation.updated_at', 'DESC')
+            .addOrderBy('conversation.id', 'DESC')
+            .take(limit);
+
+        const result = await qb.getMany();
+        const last = result[result.length - 1];
+
+        return {
+            limit,
+            hasMore: result.length === limit,
+            lastId: last?.id ?? null,
+            lastUpdatedAt: last?.updated_at ?? null,
+            data: result,
+        };
     }
 
     async createTest() {

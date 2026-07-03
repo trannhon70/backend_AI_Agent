@@ -4,7 +4,7 @@ import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGenerat
 
 @Entity('conversations')
 @Unique(['page_id', 'customer_id'])
-@Index('idx_conversation_page_updated_at_id', ['page_id', 'updated_at', 'id'])
+
 export class Conversation {
     @PrimaryGeneratedColumn()
     id!: number;
@@ -55,6 +55,9 @@ export class Conversation {
     //Thời điểm cuộc hội thoại được tạo lần đầu
     @Column({ type: 'float', nullable: true })
     created_at!: number | null;
+
+    @Column({ type: 'tsvector', select: false, nullable: true })
+    search_vector!: string;
 
     //Thời điểm cuộc hội thoại được tạo lần đầu
     @Column({ type: 'float', nullable: true })

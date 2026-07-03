@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ConversationsService } from './conversations.service';
+import { GetConversationsDto } from './dto/conversation.dto';
 
 @Controller('conversations')
 export class ConversationsController {
@@ -10,8 +11,8 @@ export class ConversationsController {
 
   @Get('get-paging')
   @UseGuards(JwtAuthGuard)
-  async getPagging(@Req() req: any, @Query() query: any) {
-    const result = await this.conversationsService.getPagging(req.user.id, query)
+  async getPagging(@Query() query: GetConversationsDto) {
+    const result = await this.conversationsService.getPagging(query)
     return {
       statusCode: 1,
       message: 'get page_id success!',
