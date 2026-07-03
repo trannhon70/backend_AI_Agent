@@ -18,16 +18,17 @@ export class ConversationsService {
     async getPagging(user_id: number, query: any) {
         try {
             const limit = query.limit ? parseInt(query.limit, 10) : 10;
+            const pageIndex = query.pageIndex ? parseInt(query.pageIndex, 10) : 1;
             const search = query.search || '';
             const page_id = query.page_id || '';
             const lastId = query.lastId ? Number(query.lastId) : undefined;
-
+            const skip = (pageIndex - 1) * limit;
             const qb = this.conversationRepo
                 .createQueryBuilder('conversation')
                 .where('conversation.page_id = :page_id', { page_id });
 
             if (search) {
-                qb.andWhere(`conversation.search_vector @@plainto_tsquery('simple', unaccent(:search))`, { search });
+                qb.andWhere(`conversation.search_vector @@websearch_to_tsquery('simple', unaccent(:search))`, { search });
             }
 
             // if (lastId) {
@@ -41,11 +42,15 @@ export class ConversationsService {
                     'lastMessage.type'
                 ])
                 .orderBy('conversation.updated_at', 'DESC')
+                .skip(skip)
                 .take(limit);
 
             const result = await qb.getMany();
+            const total = await qb.getCount();
             return {
                 limit: limit,
+                pageIndex: pageIndex,
+                totalPages: Math.ceil(total / limit),
                 hasMore: result.length === limit,
                 lastId: result[result.length - 1]?.id,
                 data: result,

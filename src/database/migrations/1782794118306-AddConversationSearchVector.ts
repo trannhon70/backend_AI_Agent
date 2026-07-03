@@ -65,6 +65,12 @@ export class AddConversationSearchVector1782794118306 implements MigrationInterf
             FOR EACH ROW
             EXECUTE FUNCTION conversation_search_vector_update();
         `);
+
+        // Composite page_id, updated_at for cursor pagination
+        await queryRunner.query(`
+            CREATE INDEX IF NOT EXISTS idx_conversation_page_updated_at
+            ON conversations(page_id, updated_at);
+        `);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -80,6 +86,10 @@ export class AddConversationSearchVector1782794118306 implements MigrationInterf
 
         await queryRunner.query(`
             DROP INDEX IF EXISTS idx_conversation_page_updated_at_id;
+        `);
+
+        await queryRunner.query(`
+            DROP INDEX IF EXISTS idx_conversation_page_updated_at;
         `);
 
         await queryRunner.query(`
