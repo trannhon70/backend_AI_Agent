@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { RedisService } from '../redis/redis.service';
 import { Conversation } from './entities/conversation.entity';
 import { GetConversationsDto } from './dto/conversation.dto';
+import { currentTimestamp } from 'src/shared/utils/currentTimestamp';
 
 @Injectable()
 export class ConversationsService {
@@ -71,7 +72,7 @@ export class ConversationsService {
             const TOTAL = 10000000;
             const BATCH_SIZE = 500000;
 
-            const now = Date.now() / 1000;
+            const now = currentTimestamp();
 
             const words: string[] = [
                 'nhận', 'thiết', 'kế', 'web', 'app',
