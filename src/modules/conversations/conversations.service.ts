@@ -17,44 +17,44 @@ export class ConversationsService {
 
     async getPagging(user_id: number, query: any) {
         try {
-            const limit = query.limit ? parseInt(query.limit, 10) : 10;
-            const pageIndex = query.pageIndex ? parseInt(query.pageIndex, 10) : 1;
+            const limit = Math.min(query.limit ? parseInt(query.limit, 10) : 10, 100000);
+            const pageIndex = Math.max(query.pageIndex ? parseInt(query.pageIndex, 10) : 1, 1);
             const search = query.search || '';
             const page_id = query.page_id || '';
-            const lastId = query.lastId ? Number(query.lastId) : undefined;
+
             const skip = (pageIndex - 1) * limit;
-            const qb = this.conversationRepo
+            const baseQb = this.conversationRepo
                 .createQueryBuilder('conversation')
                 .where('conversation.page_id = :page_id', { page_id });
 
             if (search) {
-                qb.andWhere(`conversation.search_vector @@websearch_to_tsquery('simple', unaccent(:search))`, { search });
+                baseQb.andWhere(
+                    `conversation.search_vector @@ websearch_to_tsquery('simple', unaccent(:search))`,
+                    { search }
+                );
             }
 
-            // if (lastId) {
-            //     qb.andWhere('conversation.id < :lastId', { lastId });
-            // }
+            const total = await baseQb.getCount();
 
-            qb.leftJoin('conversation.lastMessage', 'lastMessage')
+            const result = await baseQb
+                .clone()
+                .leftJoin('conversation.lastMessage', 'lastMessage')
                 .addSelect([
                     'lastMessage.id',
                     'lastMessage.text',
                     'lastMessage.type'
                 ])
                 .orderBy('conversation.updated_at', 'DESC')
+                .addOrderBy('conversation.id', 'DESC')
                 .skip(skip)
-                .take(limit);
-
-            const result = await qb.getMany();
-            const total = await qb.getCount();
+                .take(limit)
+                .getMany();
             return {
-                limit: limit,
-                pageIndex: pageIndex,
+                limit,
+                pageIndex,
+                total,
                 totalPages: Math.ceil(total / limit),
-                hasMore: result.length === limit,
-                lastId: result[result.length - 1]?.id,
                 data: result,
-
             };
         } catch (error) {
             throw error
