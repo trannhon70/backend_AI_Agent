@@ -109,7 +109,7 @@ export class ConversationsConsumer {
                         relations: ['lastMessage'],
                     });
                     // lưu message và thực hiện socket
-                    this.eventEmitter.emit(DomainEvents.conversation_socket_message, { page_id: conversation.id, message: data_mess, conversation: updatedConversation });
+                    this.eventEmitter.emit(DomainEvents.conversation_socket_message, { page_id: pageId, conversation_id: conversation.id, message: data_mess, conversation: updatedConversation });
                 }
             }
         } catch (error) {

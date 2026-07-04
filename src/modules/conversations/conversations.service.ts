@@ -31,6 +31,7 @@ export class ConversationsService {
                 'conversation.page_id',
                 'conversation.full_name',
                 'conversation.updated_at',
+                'conversation.last_message_at',
                 'conversation.unread_count',
             ])
             .where('conversation.page_id = :page_id', { page_id });

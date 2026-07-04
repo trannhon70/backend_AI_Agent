@@ -11,6 +11,7 @@ export class ConversationListener {
 
     @OnEvent(DomainEvents.conversation_socket_message)
     handleSync(payload: any) {
-        this.socketService.emitToRoom(String(payload.page_id), 'send_message', payload);
+        this.socketService.emitToRoom(`conversation:${payload.conversation_id}`, 'send_message', payload.message);
+        this.socketService.emitToRoom(`page:${payload.page_id}`, 'send_conversation', payload.conversation);
     }
 }
