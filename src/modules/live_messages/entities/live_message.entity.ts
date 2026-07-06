@@ -14,7 +14,6 @@ export class LiveMessage {
     id!: number;
 
     // 🔗 Conversation
-    @Index()
     @Column({ name: 'conversation_id' })
     conversation_id!: number;
 
@@ -25,7 +24,6 @@ export class LiveMessage {
     conversation!: Conversation;
 
     // 🔑 Facebook Message ID - tránh duplicate
-    @Index({ unique: true })
     @Column({ type: 'varchar', name: 'facebook_mid', nullable: true })
     facebook_mid!: string | null;
 
