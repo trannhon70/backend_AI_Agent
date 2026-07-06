@@ -61,7 +61,7 @@ export class AddLiveMessagesIndex1783319970526 implements MigrationInterface {
         // Composite index get paging
         await queryRunner.query(`
             CREATE INDEX IF NOT EXISTS idx_live_messages_conversation_sent_at_id
-            ON live_messages(conversation_id, sent_at, id);
+            ON live_messages(conversation_id, sent_at DESC, id DESC);
         `);
 
         // Foreign Key indexes

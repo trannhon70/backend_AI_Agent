@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { LiveMessagesService } from './live_messages.service';
 
@@ -19,4 +19,14 @@ export class LiveMessagesController {
     };
   }
 
+  @Post('create-random-messages')
+  @UseGuards(JwtAuthGuard)
+  async createRandomMessages(@Req() req: any) {
+    const result = await this.liveMessagesService.createRandomMessages(req.user.id)
+    return {
+      statusCode: 1,
+      message: 'create random messages success!',
+      data: result
+    };
+  }
 }
