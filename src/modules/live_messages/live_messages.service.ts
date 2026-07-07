@@ -17,14 +17,14 @@ export class LiveMessagesService {
     private readonly redisService: RedisService,
   ) { }
 
-  async getPagging(user_id: number, query: any) {
+  async getPagging(query: any) {
     try {
-      const limit = query.limit ? parseInt(query.limit) : 10;
+      const pageIndex = query.pageIndex ? parseInt(query.pageIndex, 10) : 1;
+      const limit = query.limit ? parseInt(query.limit, 10) : 10;
       const search = query.search || '';
       const conversation_id = query.conversation_id || '';
-      const lastId = query.lastId ? Number(query.lastId) : undefined;
-      const lastUpdatedAt = query.lastUpdatedAt || undefined;
 
+      const skip = (pageIndex - 1) * limit;
       const qb = this.liveMessageRepo.createQueryBuilder('message')
         .innerJoin('message.conversation', 'conversation')
         .leftJoin('message.user', 'user')
@@ -48,31 +48,25 @@ export class LiveMessagesService {
         ])
         .where('message.conversation_id = :conversation_id', { conversation_id })
 
-
-
       if (search) {
         qb.andWhere(
           `message.search_vector @@ websearch_to_tsquery('simple', unaccent(:search))`,
           { search },
         );
       }
-      if (lastId && lastUpdatedAt) {
-        qb.andWhere(
-          '(message.sent_at, message.id) < (:lastUpdatedAt, :lastId)',
-          { lastUpdatedAt, lastId },
-        );
-      }
 
-      qb.orderBy('message.sent_at', 'DESC').addOrderBy('message.id', 'DESC').take(limit + 1);
+
+      qb.skip(skip).take(limit)
+        .orderBy('message.sent_at', 'DESC').addOrderBy('message.id', 'DESC').take(limit + 1);
       const result = await qb.getMany();
-      const last = result[result.length - 1];
+      // result.length > limit tức là còn dữ liệu, hasMore = true, còn lại thì false
+      const hasMore = result.length > limit;
 
       return {
-        limit,
-        hasMore: result.length === limit,
-        lastId: last?.id ?? null,
-        lastUpdatedAt: last?.sent_at ?? null,
-        data: result,
+        pageIndex: pageIndex,
+        limit: limit,
+        hasMore: hasMore,
+        data: result.slice(0, limit),
       };
     } catch (error) {
       throw error

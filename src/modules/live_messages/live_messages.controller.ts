@@ -10,8 +10,8 @@ export class LiveMessagesController {
 
   @Get('get-paging')
   @UseGuards(JwtAuthGuard)
-  async getPagging(@Req() req: any, @Query() query: any) {
-    const result = await this.liveMessagesService.getPagging(req.user.id, query)
+  async getPagging(@Query() query: any) {
+    const result = await this.liveMessagesService.getPagging(query)
     return {
       statusCode: 1,
       message: 'getpaging messages success!',
