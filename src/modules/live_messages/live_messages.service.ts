@@ -17,7 +17,7 @@ export class LiveMessagesService {
     private readonly redisService: RedisService,
   ) { }
 
-  async getPagging(query: any) {
+  async getPaging(query: any) {
     try {
       const pageIndex = query.pageIndex ? parseInt(query.pageIndex, 10) : 1;
       const limit = query.limit ? parseInt(query.limit, 10) : 10;
