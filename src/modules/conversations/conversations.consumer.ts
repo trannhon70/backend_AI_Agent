@@ -87,7 +87,7 @@ export class ConversationsConsumer {
                         text: event.message.text,
                         attachments: normalizeAttachments(event.message.attachments, 'webhook'),
                         raw_data: event,
-                        sent_at: event.timestamp,
+                        sent_at: currentTimestamp(),
                         created_at: currentTimestamp(),
                     }
                     const savedMessage = await this.LiveMessageRepo.save(data_mess);

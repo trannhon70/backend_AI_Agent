@@ -37,6 +37,7 @@ export class LiveMessagesService {
           'message.attachments',
           'message.user_id',
           'message.sent_at',
+          'message.created_at',
 
           'conversation.id',
           'conversation.full_name',
@@ -47,6 +48,9 @@ export class LiveMessagesService {
           'user.avatar',
         ])
         .where('message.conversation_id = :conversation_id', { conversation_id })
+        .orderBy('message.sent_at', 'DESC').addOrderBy('message.id', 'DESC')
+        .skip(skip)
+        .take(limit + 1);
 
       if (search) {
         qb.andWhere(
@@ -56,8 +60,6 @@ export class LiveMessagesService {
       }
 
 
-      qb.skip(skip).take(limit)
-        .orderBy('message.sent_at', 'DESC').addOrderBy('message.id', 'DESC').take(limit + 1);
       const result = await qb.getMany();
       // result.length > limit tức là còn dữ liệu, hasMore = true, còn lại thì false
       const hasMore = result.length > limit;
@@ -66,7 +68,7 @@ export class LiveMessagesService {
         pageIndex: pageIndex,
         limit: limit,
         hasMore: hasMore,
-        data: result.slice(0, limit),
+        data: result.slice(0, limit).reverse(),
       };
     } catch (error) {
       throw error
