@@ -116,4 +116,23 @@ export class ConversationsConsumer {
             throw error;
         }
     }
+
+    // thực hiện update unread_count khi có message mới
+    @EventPattern(DomainEvents.conversation_update_unread_count)
+    async handleUpdateUnreadCount(@Payload() payload: any) {
+        try {
+            const { conversation_id, unread_count } = payload;
+            await this.ConversationRepo.update(
+                conversation_id,
+                {
+                    unread_count: unread_count,
+                    updated_at: currentTimestamp(),
+                },
+            );
+            // lưu conversation và thực hiện socket
+            this.eventEmitter.emit(DomainEvents.conversation_socket_unread_count, payload);
+        } catch (error) {
+            throw error;
+        }
+    }
 }

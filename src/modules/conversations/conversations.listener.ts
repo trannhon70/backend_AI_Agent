@@ -14,4 +14,9 @@ export class ConversationListener {
         this.socketService.emitToRoom(`conversation:${payload.conversation_id}`, 'send_message', payload.message);
         this.socketService.emitToRoom(`page:${payload.page_id}`, 'send_conversation', payload.conversation);
     }
+
+    @OnEvent(DomainEvents.conversation_socket_unread_count)
+    handleUpdateUnreadCount(payload: any) {
+        this.socketService.emitToRoom(`page:${payload.page_id}`, 'send_unread_count', payload);
+    }
 }
