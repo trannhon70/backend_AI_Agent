@@ -14,6 +14,7 @@ export const getDatabaseConfig = (
     synchronize: false, // Set to false in production
     migrationsRun: true,
     migrations: [__dirname + '/migrations/*{.ts,.js}'],
+    entities: [__dirname + '/**/*.entity{.ts,.js}'],
     extra: {
         // max: 10,
     },

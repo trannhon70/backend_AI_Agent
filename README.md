@@ -162,6 +162,9 @@ npm run typeorm -- migration:revert -d src/database/data-source.ts
 ## lệnh chạy migration
 npm run typeorm migration:run -- -d src/database/data-source.ts
 
+## Tạo bảng mới 
+npm run typeorm -- migration:generate src/database/migrations/CreateFilesTable -d src/database/data-source.ts
+
 ## 1. Xem toàn bộ index của 1 bảng
 SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'conversations';
 
