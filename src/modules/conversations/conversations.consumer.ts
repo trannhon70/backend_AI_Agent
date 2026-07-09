@@ -58,6 +58,9 @@ export class ConversationsConsumer {
             for (const entry of payload) {
                 const pageId = entry.id;
                 for (const event of entry.messaging) {
+                    if (!event.message) {
+                        continue;
+                    }
                     const sender_id = event.sender.id;
                     const recipient_id = event.recipient.id;
                     let type = MessageType.TEXT;

@@ -17,4 +17,7 @@ export enum DomainEvents {
     conversation_socket_message = 'conversation.socket_message',
     conversation_update_unread_count = 'conversation.update_unread_count',
     conversation_socket_unread_count = 'conversation.socket_unread_count',
+
+    //message
+    message_send = 'message.send',
 }
