@@ -1,27 +1,19 @@
-// users/users.consumer.ts
 import { Controller, Logger } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
+import { EventPattern, Payload } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MessageDirection, MessageType, ProviderEnum, RoleEnumUserPage } from 'src/shared/enums/role.enum';
 import { currentTimestamp } from 'src/shared/utils/currentTimestamp';
 import { Repository } from 'typeorm';
-import { Conversation } from '../conversations/entities/conversation.entity';
 import { DomainEvents } from '../kafka/kafka.events';
 import { LiveMessage } from '../live_messages/entities/live_message.entity';
 import { PageToken } from '../page_tokens/entities/page_token.entity';
-import { RedisService } from '../redis/redis.service';
-import { UserPage } from '../user_pages/entities/user_page.entity';
 
-import { normalizeAttachments, toUnixTimestamp } from 'src/shared/utils';
-import { Fanpage } from '../fanpages/entities/fanpage.entity';
 import axios from 'axios';
+import { Fanpage } from '../fanpages/entities/fanpage.entity';
 
 @Controller()
 export class LiveMessagesConsumer {
     private readonly logger = new Logger(LiveMessagesConsumer.name);
     constructor(
-
         @InjectRepository(PageToken)
         private readonly pageTokenRepo: Repository<PageToken>,
 
@@ -30,134 +22,129 @@ export class LiveMessagesConsumer {
 
         @InjectRepository(LiveMessage)
         private readonly liveMessageRepo: Repository<LiveMessage>,
-
-
-
     ) { }
 
     @EventPattern(DomainEvents.message_send)
     async handleMessageSend(@Payload() payload: any) {
-        const { page_id, customer_id, conversation_id, direction, type, text, user_id } = payload;
-
-        // 1. Lấy access_token, validate sớm
-        const fanpage = await this.fanpageRepo
-            .createQueryBuilder('fanpage')
-            .select('fanpage.id', 'id')
-            .where('fanpage.page_id = :pageId', { pageId: page_id })
-            .getRawOne();
-
-        const pageToken = await this.pageTokenRepo.createQueryBuilder("pageToken")
-            .select("pageToken.access_token", "access_token")
-            .where('pageToken.fanpage_id = :fanpage_id', { fanpage_id: fanpage.id })
-            .getRawOne();
-        const access_token = pageToken.access_token
-        if (!access_token) {
-            this.logger.error(`No access_token for page_id ${page_id}`);
-            return; // không throw để tránh retry vô ích
-        }
-
-        // 2. Gửi tin nhắn Facebook — lỗi ở đây KHÔNG nên retry gửi lại
-        let fbMessageId: string | undefined;
-        try {
-            const fbRes = await axios.post(
-                'https://graph.facebook.com/v23.0/me/messages',
-                { recipient: { id: customer_id }, message: { text } },
-                { params: { access_token }, timeout: 10000 }
-            );
-            fbMessageId = fbRes.data?.message_id;
-        } catch (error) {
-            this.logger.error(`Failed to send FB message for conversation ${conversation_id}`, error);
-            // Có thể lưu trạng thái "failed" vào DB thay vì throw để retry gửi lại
-            return;
-        }
-
-        // 3. Lưu message vào DB — lỗi ở đây có thể log riêng, không ảnh hưởng việc đã gửi
-        try {
-            await this.liveMessageRepo.save({
-                conversation_id,
-                sender_id: customer_id,
-                recipient_id: page_id,
-                direction,
-                type,
-                text,
-                user_id,
-                facebook_mid: fbMessageId,
-                sent_at: currentTimestamp(),
-                created_at: currentTimestamp(),
-            });
-
-        } catch (error) {
-            this.logger.error(`FB message sent but failed to save to DB for conversation ${conversation_id}`, error);
-            // Tin đã gửi thành công, chỉ log để xử lý thủ công/reconcile sau, KHÔNG throw
-        }
+        await this.send(payload);
     }
 
     @EventPattern(DomainEvents.message_send_file)
     async handleMessageSendFile(@Payload() payload: any) {
-        const { page_id, customer_id, conversation_id, direction, type, user_id, attachments, url } = payload;
+        await this.send(payload);
+    }
 
-        // 1. Lấy access_token, validate sớm
-        const fanpage = await this.fanpageRepo
-            .createQueryBuilder('fanpage')
-            .select('fanpage.id', 'id')
-            .where('fanpage.page_id = :pageId', { pageId: page_id })
-            .getRawOne();
+    private async send(payload: any) {
+        const accessToken = await this.getAccessToken(payload.page_id);
 
-        const pageToken = await this.pageTokenRepo.createQueryBuilder("pageToken")
-            .select("pageToken.access_token", "access_token")
-            .where('pageToken.fanpage_id = :fanpage_id', { fanpage_id: fanpage.id })
-            .getRawOne();
-        const access_token = pageToken.access_token
-        if (!access_token) {
-            this.logger.error(`No access_token for page_id ${page_id}`);
-            return; // không throw để tránh retry vô ích
-        }
-
-        // 2. Gửi tin nhắn Facebook — lỗi ở đây KHÔNG nên retry gửi lại
-        let fbMessageId: string | undefined;
-        try {
-            const fbRes = await axios.post(
-                'https://graph.facebook.com/v23.0/me/messages',
-                {
-                    recipient: { id: customer_id },
-                    message: {
-                        attachment: {
-                            type: "image",
-                            payload: {
-                                url: url,
-                                is_reusable: true
-                            }
-                        }
-                    }
-                },
-                { params: { access_token }, timeout: 10000 }
-            );
-            fbMessageId = fbRes.data?.message_id;
-        } catch (error) {
-            this.logger.error(`Failed to send FB message for conversation ${conversation_id}`, error);
-            // Có thể lưu trạng thái "failed" vào DB thay vì throw để retry gửi lại
+        if (!accessToken) {
+            this.logger.error(`No access token for page ${payload.page_id}`);
             return;
         }
 
-        // 3. Lưu message vào DB — lỗi ở đây có thể log riêng, không ảnh hưởng việc đã gửi
-        try {
-            await this.liveMessageRepo.save({
-                conversation_id,
-                sender_id: customer_id,
-                recipient_id: page_id,
-                direction,
-                type,
-                attachments,
-                user_id,
-                facebook_mid: fbMessageId,
-                sent_at: currentTimestamp(),
-                created_at: currentTimestamp(),
-            });
+        const message = this.buildFacebookMessage(payload);
 
-        } catch (error) {
-            this.logger.error(`FB message sent but failed to save to DB for conversation ${conversation_id}`, error);
-            // Tin đã gửi thành công, chỉ log để xử lý thủ công/reconcile sau, KHÔNG throw
+        const fbMessageId = await this.sendToFacebook(
+            payload.customer_id,
+            accessToken,
+            message,
+            payload.conversation_id,
+        );
+
+        if (!fbMessageId) return;
+
+        await this.saveMessage(payload, fbMessageId);
+    }
+
+    private async getAccessToken(pageId: string): Promise<string | null> {
+        const fanpage = await this.fanpageRepo
+            .createQueryBuilder('fanpage')
+            .select('fanpage.id', 'id')
+            .where('fanpage.page_id = :pageId', { pageId })
+            .getRawOne();
+
+        if (!fanpage) return null;
+
+        const token = await this.pageTokenRepo
+            .createQueryBuilder('pageToken')
+            .select('pageToken.access_token', 'access_token')
+            .where('pageToken.fanpage_id = :id', { id: fanpage.id })
+            .getRawOne();
+
+        return token?.access_token ?? null;
+    }
+
+    private buildFacebookMessage(payload: any) {
+        if (payload.text) {
+            return {
+                text: payload.text,
+            };
+        }
+
+        return {
+            attachment: {
+                type: payload.type,
+                payload: {
+                    url: payload.url,
+                    is_reusable: true,
+                },
+            },
+        };
+    }
+
+    private async sendToFacebook(
+        customerId: string,
+        accessToken: string,
+        message: any,
+        conversationId: number,
+    ) {
+        try {
+            const res = await axios.post(
+                'https://graph.facebook.com/v23.0/me/messages',
+                {
+                    recipient: {
+                        id: customerId,
+                    },
+                    message,
+                },
+                {
+                    params: {
+                        access_token: accessToken,
+                    },
+                    timeout: 10000,
+                },
+            );
+
+            return res.data.message_id;
+        } catch (err) {
+            this.logger.error(
+                `Failed to send FB message conversation ${conversationId}`,
+                err,
+            );
+            return null;
         }
     }
 
+    private async saveMessage(payload: any, facebookMid: string) {
+        try {
+            await this.liveMessageRepo.save({
+                conversation_id: payload.conversation_id,
+                sender_id: payload.customer_id,
+                recipient_id: payload.page_id,
+                direction: payload.direction,
+                type: payload.type,
+                text: payload.text,
+                attachments: payload.attachments,
+                user_id: payload.user_id,
+                facebook_mid: facebookMid,
+                sent_at: currentTimestamp(),
+                created_at: currentTimestamp(),
+            });
+        } catch (err) {
+            this.logger.error(
+                `FB message sent but save DB failed ${payload.conversation_id}`,
+                err,
+            );
+        }
+    }
 }

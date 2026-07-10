@@ -36,26 +36,16 @@ export class LiveMessagesController {
     };
   }
 
-  @Post('')
-  @UseGuards(JwtAuthGuard)
-  async sendMessages(@Req() req: any, @Body() body: any) {
-    const payload = {
-      user_id: req.user.id,
-      ...body
-    }
-    await this.kafkaService.publish(DomainEvents.message_send, payload);
-  }
-
-  @Post('send-file')
+  @Post()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
-  async sendFile(@Req() req: any, @Body() body: any, @UploadedFile() file: Express.Multer.File,) {
-    const result: any = await this.cloudinaryService.upload(file);
-    const payload = {
-      user_id: req.user.id,
-      ...body,
-      url: result.url,
-      attachments: [
+  async send(@Req() req: any, @Body() body: any, @UploadedFile() file?: Express.Multer.File,) {
+    let attachments;
+    let url;
+    if (file) {
+      const result: any = await this.cloudinaryService.upload(file);
+      url = result.url;
+      attachments = [
         {
           id: result.asset_id,
           url: result.url,
@@ -63,31 +53,16 @@ export class LiveMessagesController {
           height: result.height,
           mime_type: result.resource_type,
           preview_url: result.secure_url,
-        }
-      ]
+        },
+      ];
     }
-    await this.kafkaService.publish(DomainEvents.message_send_file, payload);
 
+    await this.kafkaService.publish(DomainEvents.message_send, {
+      user_id: req.user.id,
+      ...body,
+      url,
+      attachments,
+    });
   }
 }
 
-// asset_id: '44fdcafe64c295477425b830da57d3b4',
-//   public_id: 'chat/kt3h5nmh2asegv9xw0sk',
-//   version: 1783647076,
-//   version_id: 'a230dea6c088d98ad50365c7c204fd54',
-//   signature: '53add347dbb29785a6c9c86e43813d1b74c5e09d',
-//   width: 64,
-//   height: 64,
-//   format: 'png',
-//   resource_type: 'image',
-//   created_at: '2026-07-10T01:31:16Z',
-//   tags: [],
-//   bytes: 633,
-//   type: 'upload',
-//   etag: 'a32392b68d53a66a19907075a81e244c',
-//   placeholder: false,
-//   url: 'http://res.cloudinary.com/dbvslauh7/image/upload/v1783647076/chat/kt3h5nmh2asegv9xw0sk.png',
-//   secure_url: 'https://res.cloudinary.com/dbvslauh7/image/upload/v1783647076/chat/kt3h5nmh2asegv9xw0sk.png',
-//   folder: 'chat',
-//   original_filename: 'file',
-//   api_key: '634127849789218'
