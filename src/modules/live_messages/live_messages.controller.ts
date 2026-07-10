@@ -40,8 +40,9 @@ export class LiveMessagesController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async send(@Req() req: any, @Body() body: any, @UploadedFile() file?: Express.Multer.File,) {
-    let attachments;
-    let url;
+
+    let attachments = body.attachments;
+    let url = body.attachments[0].url
     if (file) {
       const result: any = await this.cloudinaryService.upload(file);
       url = result.url;
