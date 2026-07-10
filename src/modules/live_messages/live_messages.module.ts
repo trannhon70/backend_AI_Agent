@@ -7,10 +7,11 @@ import { LiveMessagesConsumer } from './live_messages.consumer';
 import { LiveMessagesRepository } from './live_messages.repository';
 import { PageToken } from '../page_tokens/entities/page_token.entity';
 import { Fanpage } from '../fanpages/entities/fanpage.entity';
+import { CloudinaryService } from 'src/shared/cloudinary';
 
 @Module({
   imports: [TypeOrmModule.forFeature([LiveMessage, PageToken, Fanpage])],
   controllers: [LiveMessagesController, LiveMessagesConsumer],
-  providers: [LiveMessagesService, LiveMessagesRepository],
+  providers: [LiveMessagesService, LiveMessagesRepository, CloudinaryService],
 })
 export class LiveMessagesModule { }

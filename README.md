@@ -218,3 +218,6 @@ SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'conversations';
 - Partial Index: cho các điều kiện như is_deleted = false.
 - GIN Index: cho search_vector và nếu dùng jsonb hoặc pg_trgm.
 - Expression Index: nếu thường xuyên tìm kiếm không phân biệt hoa thường (LOWER(email) chẳng hạn).
+
+## store lưu cnd file 
+https://console.cloudinary.com/app/c-45c6bd6465bbb5f74168580c9d2082/home/delivery-reports
