@@ -9,6 +9,7 @@ import { PageToken } from '../page_tokens/entities/page_token.entity';
 
 import axios from 'axios';
 import { Fanpage } from '../fanpages/entities/fanpage.entity';
+import { Conversation } from '../conversations/entities/conversation.entity';
 
 @Controller()
 export class LiveMessagesConsumer {
@@ -22,6 +23,9 @@ export class LiveMessagesConsumer {
 
         @InjectRepository(LiveMessage)
         private readonly liveMessageRepo: Repository<LiveMessage>,
+
+        @InjectRepository(Conversation)
+        private readonly conversationRepo: Repository<Conversation>,
     ) { }
 
     @EventPattern(DomainEvents.message_send)
@@ -127,7 +131,7 @@ export class LiveMessagesConsumer {
 
     private async saveMessage(payload: any, facebookMid: string) {
         try {
-            await this.liveMessageRepo.save({
+            const savedMessage = await this.liveMessageRepo.save({
                 conversation_id: payload.conversation_id,
                 sender_id: payload.customer_id,
                 recipient_id: payload.page_id,
@@ -140,6 +144,12 @@ export class LiveMessagesConsumer {
                 sent_at: currentTimestamp(),
                 created_at: currentTimestamp(),
             });
+            await this.conversationRepo.update(payload.conversation_id, {
+                last_message_id: savedMessage.id ?? '[Attachment]',
+                last_message_at: currentTimestamp(),
+                updated_at: currentTimestamp(),
+            })
+
         } catch (err) {
             this.logger.error(
                 `FB message sent but save DB failed ${payload.conversation_id}`,
