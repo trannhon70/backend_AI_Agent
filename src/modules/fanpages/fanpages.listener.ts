@@ -11,6 +11,6 @@ export class FanpageSyncListener {
 
     @OnEvent(DomainEvents.FanPage_sync_socket)
     handleSync(payload: any) {
-        this.socketService.emitToRoom(String(payload.page_id), 'syncStatus', payload);
+        this.socketService.emitToRoom(`page:${payload.page_id}`, 'syncStatus', payload);
     }
 }
