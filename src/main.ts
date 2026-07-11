@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: [process.env.URL_BACKEND, process.env.URL_FRONTEND, 'https://crm-ai-gent.vercel.app'],
+    origin: [process.env.URL_BACKEND, process.env.URL_FRONTEND, 'https://crm-ai-gent.vercel.app', 'http://192.168.142.1:5173'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
@@ -24,6 +24,9 @@ async function bootstrap() {
       consumer: {
         groupId: KafkaConstants.ConsumerGroups.Default,
         allowAutoTopicCreation: true,
+        sessionTimeout: 60000,
+        heartbeatInterval: 3000,
+        rebalanceTimeout: 60000,
       },
     },
   });
