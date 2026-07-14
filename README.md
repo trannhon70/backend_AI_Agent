@@ -154,6 +154,9 @@ https://console.cloud.google.com/apis/credentials?project=onbai-449403
 ## doc facebook
 https://developers.facebook.com/apps/
 
+## doc telegram
+https://my.telegram.org/apps
+
 ## Thêm cột search_vector
 npm run typeorm migration:create src/database/migrations/AddConversationSearchVector
 
