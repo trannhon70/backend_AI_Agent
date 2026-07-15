@@ -83,6 +83,7 @@ export class ConversationsConsumer {
                     const data_mess = {
                         conversation_id: conversation.id,
                         facebook_mid: event.message.mid,
+                        reply_to_id: event.message.reply_to.mid ?? null,
                         sender_id: sender_id,
                         recipient_id: recipient_id,
                         direction: MessageDirection.CUSTOMER,

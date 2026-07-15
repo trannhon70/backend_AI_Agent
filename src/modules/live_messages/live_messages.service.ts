@@ -28,6 +28,7 @@ export class LiveMessagesService {
       const qb = this.liveMessageRepo.createQueryBuilder('message')
         .innerJoin('message.conversation', 'conversation')
         .leftJoin('message.user', 'user')
+        .leftJoin('message.reply_to', 'replyMessage')
         .select([
           'message.id',
           'message.conversation_id',
@@ -46,6 +47,18 @@ export class LiveMessagesService {
           'user.id',
           'user.full_name',
           'user.avatar',
+
+          // Message được reply
+          'replyMessage.id',
+          'replyMessage.conversation_id',
+          'replyMessage.direction',
+          'replyMessage.type',
+          'replyMessage.text',
+          'replyMessage.attachments',
+          'replyMessage.user_id',
+          'replyMessage.sent_at',
+          'replyMessage.created_at',
+
         ])
         .where('message.conversation_id = :conversation_id', { conversation_id })
         .orderBy('message.sent_at', 'DESC').addOrderBy('message.id', 'DESC')

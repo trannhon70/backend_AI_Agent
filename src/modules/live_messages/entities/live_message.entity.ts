@@ -4,7 +4,8 @@ import { MessageDirection, MessageType } from 'src/shared/enums/role.enum';
 import { NormalizedAttachment } from 'src/shared/interfaces';
 import {
     Entity, PrimaryGeneratedColumn, Column,
-    ManyToOne, JoinColumn, Index
+    ManyToOne, JoinColumn, Index,
+    OneToMany
 } from 'typeorm';
 
 @Entity('live_messages')
@@ -24,7 +25,12 @@ export class LiveMessage {
     conversation!: Conversation;
 
     // 🔑 Facebook Message ID - tránh duplicate
-    @Column({ type: 'varchar', name: 'facebook_mid', nullable: true })
+    @Column({
+        type: 'varchar',
+        name: 'facebook_mid',
+        nullable: true,
+        unique: true,
+    })
     facebook_mid!: string | null;
 
     // 👤 sender & recipient (PSID hoặc Page ID)
@@ -77,4 +83,24 @@ export class LiveMessage {
     // ⏱ Thời gian lưu vào DB
     @Column({ type: 'float', nullable: true })
     created_at!: number | null;
+
+    // Reply message
+    @Column({
+        type: 'varchar',
+        nullable: true,
+    })
+    reply_to_id!: string | null;
+
+    @ManyToOne(() => LiveMessage, (message) => message.replies, {
+        nullable: true,
+        onDelete: 'SET NULL',
+    })
+    @JoinColumn({
+        name: 'reply_to_id',
+        referencedColumnName: 'facebook_mid',
+    })
+    reply_to!: LiveMessage | null;
+
+    @OneToMany(() => LiveMessage, (message) => message.reply_to)
+    replies!: LiveMessage[];
 }
