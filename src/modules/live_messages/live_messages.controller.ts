@@ -43,7 +43,6 @@ export class LiveMessagesController {
 
     let attachments = body?.attachments;
     let url = body?.attachments?.[0]?.url;
-
     if (file) {
       const result: any = await this.cloudinaryService.upload(file);
       url = result.url;
