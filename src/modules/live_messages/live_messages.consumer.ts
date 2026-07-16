@@ -141,7 +141,7 @@ export class LiveMessagesConsumer {
                 attachments: payload.attachments,
                 user_id: payload.user_id,
                 facebook_mid: facebookMid,
-                reply_to_id: payload.reply_to.facebook_mid ?? null,
+                reply_to_id: payload?.reply_to?.facebook_mid ?? null,
                 sent_at: currentTimestamp(),
                 created_at: currentTimestamp(),
             });
