@@ -31,6 +31,8 @@ export class LiveMessagesService {
         .leftJoin('message.reply_to', 'replyMessage')
         .select([
           'message.id',
+          'message.reply_to_id',
+          'message.facebook_mid',
           'message.conversation_id',
           'message.direction',
           'message.type',
