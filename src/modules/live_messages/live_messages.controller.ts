@@ -38,26 +38,9 @@ export class LiveMessagesController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('file'))
-  async send(@Req() req: any, @Body() body: any, @UploadedFile() file?: Express.Multer.File,) {
-
+  async send(@Req() req: any, @Body() body: any) {
     let attachments = body?.attachments;
     let url = body?.attachments?.[0]?.url;
-    if (file) {
-      const result: any = await this.cloudinaryService.upload(file);
-      url = result.url;
-      attachments = [
-        {
-          id: result.asset_id,
-          url: result.url,
-          width: result.width,
-          height: result.height,
-          mime_type: result.resource_type,
-          preview_url: result.secure_url,
-        },
-      ];
-    }
-
     await this.kafkaService.publish(DomainEvents.message_send, {
       user_id: req.user.id,
       ...body,
