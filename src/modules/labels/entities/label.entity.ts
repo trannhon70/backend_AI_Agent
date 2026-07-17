@@ -9,11 +9,11 @@ export class Label {
     @PrimaryGeneratedColumn("increment")
     id!: number;
 
-    @Column({ type: 'varchar', length: 100, })
-    name!: string;
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    name!: string | null;
 
-    @Column({ type: 'varchar', length: 20, })
-    color!: string;
+    @Column({ type: 'varchar', length: 20, nullable: true })
+    color!: string | null;
 
     @Column({ nullable: true })
     fanpage_id!: number | null;

@@ -11,12 +11,7 @@ export class AllterMessageReply1784086205100 implements MigrationInterface {
             DROP CONSTRAINT IF EXISTS "FK_87b211a636e70ab69362e88e802";
         `);
 
-        // facebook_mid phải unique
-        await queryRunner.query(`
-            ALTER TABLE "live_messages"
-            ADD CONSTRAINT "UQ_live_messages_facebook_mid"
-            UNIQUE ("facebook_mid");
-        `);
+
 
         // Đổi reply_to_id sang varchar
         await queryRunner.query(`
@@ -43,10 +38,7 @@ export class AllterMessageReply1784086205100 implements MigrationInterface {
             DROP CONSTRAINT IF EXISTS "FK_live_messages_reply";
         `);
 
-        await queryRunner.query(`
-            ALTER TABLE "live_messages"
-            DROP CONSTRAINT IF EXISTS "UQ_live_messages_facebook_mid";
-        `);
+
 
         await queryRunner.query(`
             ALTER TABLE "live_messages"

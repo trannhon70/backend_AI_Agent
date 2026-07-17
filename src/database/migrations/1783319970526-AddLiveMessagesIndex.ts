@@ -75,11 +75,7 @@ export class AddLiveMessagesIndex1783319970526 implements MigrationInterface {
             ON live_messages(conversation_id);
         `);
 
-        await queryRunner.query(`
-            ALTER TABLE live_messages
-            ADD CONSTRAINT uq_live_messages_facebook_mid
-            UNIQUE(facebook_mid);
-        `);
+
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -90,7 +86,7 @@ export class AddLiveMessagesIndex1783319970526 implements MigrationInterface {
         await queryRunner.query(`DROP INDEX IF EXISTS idx_live_messages_conversation_sent_at_id;`);
         await queryRunner.query(`DROP INDEX IF EXISTS idx_live_messages_user_id;`);
         await queryRunner.query(`DROP INDEX IF EXISTS idx_live_messages_conversation_id;`);
-        await queryRunner.query(`ALTER TABLE live_messagesDROP CONSTRAINT uq_live_messages_facebook_mid;`);
+
     }
 
 }
