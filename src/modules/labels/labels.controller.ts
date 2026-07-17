@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpException, HttpStatus, BadRequestException, Put, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpException, HttpStatus, BadRequestException, Put, ParseIntPipe, Query } from '@nestjs/common';
 import { LabelsService } from './labels.service';
 import { CreateLabelDto } from './dto/create-label.dto';
 import { UpdateLabelDto } from './dto/update-label.dto';
 import { KafkaService } from '../kafka/kafka.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { DomainEvents } from '../kafka/kafka.events';
+import { GetPagingLabelDto } from './dto/getpaging-label.dto';
 
 @Controller('labels')
 export class LabelsController {
@@ -63,5 +64,15 @@ export class LabelsController {
 
   }
 
+  @Get('get-paging')
+  @UseGuards(JwtAuthGuard)
+  async getPaging(@Query() query: GetPagingLabelDto) {
+    const result = await this.labelsService.getPaging(query)
+    return {
+      statusCode: 1,
+      message: 'get getPaging success!',
+      data: result
+    };
+  }
 
 }
