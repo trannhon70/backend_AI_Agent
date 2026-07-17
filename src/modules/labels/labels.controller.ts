@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpException, HttpStatus, BadRequestException } from '@nestjs/common';
 import { LabelsService } from './labels.service';
 import { CreateLabelDto } from './dto/create-label.dto';
 import { UpdateLabelDto } from './dto/update-label.dto';
@@ -17,12 +17,17 @@ export class LabelsController {
   @UseGuards(JwtAuthGuard)
   async create(@Body() body: CreateLabelDto) {
 
-    const result = await this.kafkaService.publish(DomainEvents.label_create, body)
-    return {
-      statusCode: 1,
-      message: 'create label success!',
-      data: result
+    try {
+      const result = await this.kafkaService.send(DomainEvents.label_create, body);
+      return {
+        statusCode: 200,
+        message: 'Thêm mới thẻ hội thoại thành công ',
+        data: result
+      }
+    } catch (e) {
+      throw new BadRequestException(e);
     }
+
   }
 
 

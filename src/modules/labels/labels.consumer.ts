@@ -2,7 +2,7 @@ import { BadRequestException, Controller, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EventPattern, Payload, MessagePattern, RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { DomainEvents } from '../kafka/kafka.events';
 import { Label } from './entities/label.entity';
 import { LabelsRepository } from './labels.repository';
@@ -18,10 +18,10 @@ export class LabelConsumer {
         @InjectRepository(Label)
         private readonly LabelRepo: Repository<Label>,
 
-        private readonly LabelRepoConfig: LabelsRepository,
+        private readonly labelsRepository: LabelsRepository,
 
         @InjectRepository(Fanpage)
-        private readonly FanpageRepo: Repository<Fanpage>,
+        private readonly fanpageRepo: Repository<Fanpage>,
 
 
         private readonly eventEmitter: EventEmitter2,
@@ -29,33 +29,43 @@ export class LabelConsumer {
 
 
     @MessagePattern(DomainEvents.label_create)
-    async createLabel(@Payload() dto: CreateLabelDto): Promise<Label> {
-        const fanpage = await this.FanpageRepo.findOne({
-            where: { page_id: dto.page_id },
-            select: { id: true },
+    async createLabel(@Payload() dto: CreateLabelDto) {
+        const fanpage = await this.fanpageRepo.findOneBy({
+            page_id: dto.page_id,
         });
 
         if (!fanpage) {
-            throw new RpcException('Fanpage not found');
+            throw new RpcException({
+                statusCode: 404,
+                message: 'Không tìm thấy trang fanpage!',
+            });
         }
 
-        const exists = await this.LabelRepo.exists({
-            where: {
-                fanpage_id: fanpage.id,
+        try {
+            return await this.labelsRepository.create({
                 name: dto.name,
-            },
-        });
+                color: dto.color,
+                fanpage_id: fanpage.id,
+                created_at: currentTimestamp(),
+            });
+        } catch (error) {
+            this.logger.error(error);
 
-        if (exists) {
-            throw new RpcException(`Label "${dto.name}" already exists.`);
+            if (
+                error instanceof QueryFailedError &&
+                error.driverError?.code === '23505'
+            ) {
+                throw new RpcException({
+                    statusCode: 409,
+                    message: 'Thẻ hội thoại này đã tồn tại!',
+                });
+            }
+
+            throw new RpcException({
+                statusCode: 500,
+                message: 'Internal server error',
+            });
         }
-
-        return this.LabelRepoConfig.create({
-            name: dto.name,
-            color: dto.color,
-            fanpage_id: fanpage.id,
-            created_at: currentTimestamp(),
-        });
     }
 
 
