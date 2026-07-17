@@ -21,4 +21,7 @@ export enum DomainEvents {
     //message
     message_send = 'message.send',
     message_send_file = 'message.send_file',
+
+    //label
+    label_create = 'label.create',
 }

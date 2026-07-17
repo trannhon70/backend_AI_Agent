@@ -1,34 +1,29 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { LabelsService } from './labels.service';
 import { CreateLabelDto } from './dto/create-label.dto';
 import { UpdateLabelDto } from './dto/update-label.dto';
+import { KafkaService } from '../kafka/kafka.service';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { DomainEvents } from '../kafka/kafka.events';
 
 @Controller('labels')
 export class LabelsController {
-  constructor(private readonly labelsService: LabelsService) {}
+  constructor(
+    private readonly labelsService: LabelsService,
+    private readonly kafkaService: KafkaService,
+  ) { }
 
   @Post()
-  create(@Body() createLabelDto: CreateLabelDto) {
-    return this.labelsService.create(createLabelDto);
+  @UseGuards(JwtAuthGuard)
+  async create(@Body() body: CreateLabelDto) {
+
+    const result = await this.kafkaService.publish(DomainEvents.label_create, body)
+    return {
+      statusCode: 1,
+      message: 'create label success!',
+      data: result
+    }
   }
 
-  @Get()
-  findAll() {
-    return this.labelsService.findAll();
-  }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.labelsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLabelDto: UpdateLabelDto) {
-    return this.labelsService.update(+id, updateLabelDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.labelsService.remove(+id);
-  }
 }

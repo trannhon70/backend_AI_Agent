@@ -1,16 +1,18 @@
 
 import { Fanpage } from "src/modules/fanpages/entities/fanpage.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 
 @Entity('labels')
+@Unique('uq_labels_fanpage_id_name', ['fanpage_id', 'name'])
+@Index('idx_labels_fanpage_created_at_id', ['fanpage_id', 'created_at', 'id'])
 export class Label {
     @PrimaryGeneratedColumn("increment")
     id!: number;
 
-    @Column({ nullable: true })
+    @Column({ type: 'varchar', length: 100, })
     name!: string;
 
-    @Column({ nullable: true })
+    @Column({ type: 'varchar', length: 20, })
     color!: string;
 
     @Column({ nullable: true })
