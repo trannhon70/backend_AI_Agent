@@ -30,5 +30,22 @@ export class LabelsController {
 
   }
 
+  @Delete(":id")
+  @UseGuards(JwtAuthGuard)
+  async delete(@Param() param: any) {
+
+    try {
+      const result = await this.labelsService.delete(param)
+      return {
+        statusCode: 200,
+        message: 'Xóa thẻ hội thoại thành công ',
+        data: result
+      }
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
+
+  }
+
 
 }

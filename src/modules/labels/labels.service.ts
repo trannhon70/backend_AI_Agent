@@ -1,26 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { CreateLabelDto } from './dto/create-label.dto';
 import { UpdateLabelDto } from './dto/update-label.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Label } from './entities/label.entity';
+import { Repository } from 'typeorm';
+import { LabelsRepository } from './labels.repository';
 
 @Injectable()
 export class LabelsService {
-  create(createLabelDto: CreateLabelDto) {
-    return 'This action adds a new label';
+  constructor(
+    @InjectRepository(Label)
+    private LabelRepo: Repository<Label>,
+
+    private readonly labelsRepository: LabelsRepository,
+
+  ) { }
+
+  async delete(param: any) {
+    try {
+      return await this.labelsRepository.update(param.id, { is_deleted: true })
+    } catch (error) {
+      throw error
+    }
   }
 
-  findAll() {
-    return `This action returns all labels`;
-  }
 
-  findOne(id: number) {
-    return `This action returns a #${id} label`;
-  }
-
-  update(id: number, updateLabelDto: UpdateLabelDto) {
-    return `This action updates a #${id} label`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} label`;
-  }
 }
