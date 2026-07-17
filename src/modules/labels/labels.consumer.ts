@@ -9,6 +9,7 @@ import { LabelsRepository } from './labels.repository';
 import { CreateLabelDto } from './dto/create-label.dto';
 import { currentTimestamp } from 'src/shared/utils/currentTimestamp';
 import { Fanpage } from '../fanpages/entities/fanpage.entity';
+import { UpdateLabelDto } from './dto/update-label.dto';
 
 
 @Controller()
@@ -47,6 +48,33 @@ export class LabelConsumer {
                 color: dto.color,
                 fanpage_id: fanpage.id,
                 created_at: currentTimestamp(),
+            });
+        } catch (error) {
+            this.logger.error(error);
+
+            if (
+                error instanceof QueryFailedError &&
+                error.driverError?.code === '23505'
+            ) {
+                throw new RpcException({
+                    statusCode: 409,
+                    message: 'Thẻ hội thoại này đã tồn tại!',
+                });
+            }
+
+            throw new RpcException({
+                statusCode: 500,
+                message: 'Internal server error',
+            });
+        }
+    }
+
+    @MessagePattern(DomainEvents.label_update)
+    async updateLabel(@Payload() dto: UpdateLabelDto) {
+        try {
+            return await this.labelsRepository.update(dto.id, {
+                name: dto.name,
+                color: dto.color,
             });
         } catch (error) {
             this.logger.error(error);
