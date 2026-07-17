@@ -21,6 +21,8 @@ import { FanpagesModule } from './modules/fanpages/fanpages.module';
 import { UserPagesModule } from './modules/user_pages/user_pages.module';
 import { PageTokensModule } from './modules/page_tokens/page_tokens.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AiModule } from './modules/ai/ai.module';
+import { LabelsModule } from './modules/labels/labels.module';
 
 @Module({
   imports: [
@@ -50,6 +52,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     FanpagesModule,
     UserPagesModule,
     PageTokensModule,
+    AiModule,
+    LabelsModule,
 
   ],
   controllers: [AppController],
