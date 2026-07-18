@@ -22,7 +22,7 @@ export class Label {
     @JoinColumn({ name: 'fanpage_id' })
     fanpage!: Fanpage | null;
 
-    // false: active, true: deleted
+    // false: đang được sử dụng, true: ngưng sử dụng
     @Column({ default: false })
     is_deleted!: boolean;
 
