@@ -4,7 +4,7 @@ import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, U
 
 @Entity('labels')
 @Unique('uq_labels_fanpage_id_name', ['fanpage_id', 'name'])
-@Index('idx_labels_fanpage_created_at_id', ['fanpage_id', 'created_at', 'id'])
+@Index('idx_labels_fanpage_created_at_id', ['fanpage_id', 'is_deleted', 'created_at', 'id'])
 export class Label {
     @PrimaryGeneratedColumn("increment")
     id!: number;

@@ -1,11 +1,9 @@
 import { Transform, Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 
 
 export class GetPagingLabelDto {
-
-
     @IsOptional()
     @Transform(({ value }) => {
         if (
@@ -24,12 +22,12 @@ export class GetPagingLabelDto {
     @Type(() => Number)
     @IsInt()
     @Min(1)
-    @Max(50000)
     limit?: number;
 
     @IsOptional()
     @Type(() => Number)
     @IsInt()
+    @Min(1)
     pageIndex?: number;
 
     @IsOptional()
@@ -39,4 +37,13 @@ export class GetPagingLabelDto {
     @IsOptional()
     @IsString()
     search?: string;
+
+    @IsOptional()
+    @Transform(({ value }) => {
+        if (value === true || value === "true") return true;
+        if (value === false || value === "false") return false;
+        return undefined;
+    })
+    @IsBoolean()
+    is_deleted?: boolean;
 }

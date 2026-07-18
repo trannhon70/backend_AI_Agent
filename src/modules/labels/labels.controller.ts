@@ -75,4 +75,14 @@ export class LabelsController {
     };
   }
 
+  @Post('random')
+  async Random() {
+    const result = await this.labelsService.random()
+    return {
+      statusCode: 1,
+      message: 'create random success!',
+      data: result
+    };
+  }
+
 }
