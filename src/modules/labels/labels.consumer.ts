@@ -97,5 +97,29 @@ export class LabelConsumer {
         }
     }
 
+    @MessagePattern(DomainEvents.label_restore)
+    async restoreLabel(@Payload() dto: any) {
+        try {
+            return await this.labelsRepository.update(dto.id, { is_deleted: false });
+        } catch (error) {
+            this.logger.error(error);
+
+            if (
+                error instanceof QueryFailedError &&
+                error.driverError?.code === '23505'
+            ) {
+                throw new RpcException({
+                    statusCode: 409,
+                    message: 'Thẻ hội thoại này đã tồn tại!',
+                });
+            }
+
+            throw new RpcException({
+                statusCode: 500,
+                message: 'Internal server error',
+            });
+        }
+    }
+
 
 }

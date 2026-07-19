@@ -25,4 +25,5 @@ export enum DomainEvents {
     //label
     label_create = 'label.create',
     label_update = 'label.update',
+    label_restore = 'label.restore',
 }

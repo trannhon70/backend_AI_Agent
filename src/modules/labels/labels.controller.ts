@@ -85,4 +85,19 @@ export class LabelsController {
     };
   }
 
+  @Put("restore/:id")
+  @UseGuards(JwtAuthGuard)
+  async restore(@Param() param: number) {
+    try {
+      const result = await this.kafkaService.send(DomainEvents.label_restore, param);
+      return {
+        statusCode: 200,
+        message: 'Khôi phục thẻ hội thoại thành công ',
+        data: result
+      }
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
+  }
+
 }
