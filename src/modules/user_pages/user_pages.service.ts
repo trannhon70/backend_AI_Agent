@@ -1,13 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { RedisService } from '../redis/redis.service';
-import { UserPage } from './entities/user_page.entity';
-import { User } from '../users/entities/user.entity';
-import { Fanpage } from '../fanpages/entities/fanpage.entity';
 import { ProviderEnum } from 'src/shared/enums/role.enum';
 import { currentTimestamp } from 'src/shared/utils/currentTimestamp';
+import { Repository } from 'typeorm';
+import { Fanpage } from '../fanpages/entities/fanpage.entity';
+import { RedisService } from '../redis/redis.service';
+import { User } from '../users/entities/user.entity';
+import { GetPagingUserPageDto } from './dto/getpaging-user-page.dto';
+import { UserPage } from './entities/user_page.entity';
 
 @Injectable()
 export class UserPagesService {
@@ -139,48 +140,40 @@ export class UserPagesService {
     }
   }
 
-  async getPagingUserPageActive(user_id: number, query: any) {
+  async getPagingUserPageActive(query: GetPagingUserPageDto) {
     try {
-      const pageIndex = query.pageIndex ? parseInt(query.pageIndex, 10) : 1;
-      const pageSize = query.pageSize ? parseInt(query.pageSize, 10) : 10;
-      const search = query.search || '';
-      const page_id = query.page_id || '';
-      const skip = (pageIndex - 1) * pageSize;
-      const fanpage = await this.fanpageRepo.findOneByOrFail({ page_id });
+      const { pageIndex = 1, limit = 10, search, page_id } = query;
+      const fanpage = await this.fanpageRepo.findOne({ where: { page_id }, select: { id: true }, });
+      if (!fanpage) {
+        throw new NotFoundException('Không tìm thấy fanpage!');
+      }
 
-      const qb = this.UserPageRepo.createQueryBuilder('user_page')
-        .leftJoinAndSelect('user_page.user', 'user')
+      const qb = this.UserPageRepo
+        .createQueryBuilder('user_page')
+        .leftJoinAndSelect('user_page.user', 'u')
         .select('user_page')
-        .addSelect([
-          'user.id',
-          'user.email',
-          'user.full_name',
-          'user.avatar',
-        ])
-        .skip(skip)
-        .take(pageSize)
-        .orderBy('user_page.id', 'DESC');
+        .addSelect(['u.id', 'u.email', 'u.full_name', 'u.avatar'])
+        .where('user_page.fanpage_id = :fanpage_id', { fanpage_id: fanpage.id })
 
-      if (fanpage.id) {
-        qb.andWhere('user_page.fanpage_id = :fanpage_id', {
-          fanpage_id: fanpage.id,
-        });
+      if (search?.trim()) {
+        qb.addSelect(`ts_rank_cd(u.search_vector, websearch_to_tsquery('simple', unaccent(:search)))`, 'rank')
+          .andWhere(`u.search_vector @@ websearch_to_tsquery('simple', unaccent(:search))`, { search: search.trim() })
+          .orderBy('rank', 'DESC')
+          .addOrderBy('user_page.created_at', 'DESC')
+          .addOrderBy('user_page.id', 'DESC');
+      } else {
+        qb.orderBy('user_page.created_at', 'DESC').addOrderBy('user_page.id', 'DESC');
       }
 
-      if (search) {
-        qb.andWhere('user.email ILIKE :search OR user.full_name ILIKE :search', {
-          search: `%${search}%`,
-        });
-      }
+      qb.skip((pageIndex - 1) * limit).take(limit + 1);
+      const rows = await qb.getMany();
+      const hasMore = rows.length > limit;
 
-      const [result, total] = await qb.getManyAndCount();
       return {
-        data: result,
-        total: total,
-        pageIndex: pageIndex,
-        pageSize: pageSize,
-        totalPages: Math.ceil(total / pageSize),
-
+        pageIndex,
+        limit,
+        hasMore,
+        data: hasMore ? rows.slice(0, limit) : rows,
       };
     } catch (error) {
       console.log(error);

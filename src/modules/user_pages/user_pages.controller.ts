@@ -1,8 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, UseGuards } from '@nestjs/common';
-import { UserPagesService } from './user_pages.service';
-import { CreateUserPageDto } from './dto/create-user_page.dto';
-import { UpdateUserPageDto } from './dto/update-user_page.dto';
+import { Body, Controller, Delete, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { GetPagingUserPageDto } from './dto/getpaging-user-page.dto';
+import { UserPagesService } from './user_pages.service';
 
 @Controller('user-pages')
 export class UserPagesController {
@@ -56,8 +55,8 @@ export class UserPagesController {
 
   @Get('get-paging-user-page-active')
   @UseGuards(JwtAuthGuard)
-  async getPagingUserPageActive(@Req() req: any, @Query() query: any) {
-    const data = await this.userPagesService.getPagingUserPageActive(req.user.id, query);
+  async getPagingUserPageActive(@Query() query: GetPagingUserPageDto) {
+    const data = await this.userPagesService.getPagingUserPageActive(query);
     return {
       statusCode: 1,
       message: 'get paging user pages success!',

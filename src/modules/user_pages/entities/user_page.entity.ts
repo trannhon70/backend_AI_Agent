@@ -3,10 +3,11 @@ import { User } from 'src/modules/users/entities/user.entity';
 import { ProviderEnum, RoleEnumUserPage } from 'src/shared/enums/role.enum';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique, Index } from 'typeorm';
 
-@Index('idx_user_page_fanpage', ['fanpage_id'])
 @Index('idx_user_page_user', ['user_id'])
+@Index('idx_user_page_fanpage_created_at_id', ['fanpage_id', 'created_at', 'id'],)
+
 @Entity('user_pages')
-@Unique(["user_id", "fanpage_id"])
+@Unique('uq_user_page_user_fanpage', ['user_id', 'fanpage_id'])
 export class UserPage {
     @PrimaryGeneratedColumn("increment")
     id!: number;
