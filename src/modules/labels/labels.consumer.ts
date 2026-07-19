@@ -75,6 +75,7 @@ export class LabelConsumer {
             return await this.labelsRepository.update(dto.id, {
                 name: dto.name,
                 color: dto.color,
+                is_deleted: dto.is_deleted
             });
         } catch (error) {
             this.logger.error(error);
