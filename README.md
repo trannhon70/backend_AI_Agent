@@ -191,6 +191,10 @@ SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'conversations';
   - CREATE INDEX idx_users_provider ON users(provider) INCLUDE(name,email); "Database không cần đọc table. Chỉ đọc index"
 
 6. Full Text Search Index (GIN)
+ - Search tất cả từ (AND): plainto_tsquery()
+ - Search OR: to_tsquery()
+ - Search NOT: websearch_to_tsquery()
+ - Search Phrase (đúng cụm): phraseto_tsquery()
 
 7. Foreign Key Index "Postgres KHÔNG tự tạo index cho foreign key."
   - Ví dụ: posts.user_id

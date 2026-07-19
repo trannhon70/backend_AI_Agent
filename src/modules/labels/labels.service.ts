@@ -40,20 +40,22 @@ export class LabelsService {
 
     const qb = this.labelRepo
       .createQueryBuilder('label')
-      .select(['label.id', 'label.name', 'label.color', 'label.created_at', 'label.is_deleted',])
+      .select(['label.id', 'label.name', 'label.color', 'label.created_at', 'label.is_deleted'])
       .where('label.fanpage_id = :fanpage_id', { fanpage_id: fanpage.id })
       .andWhere('label.is_deleted = :is_deleted', { is_deleted });
 
     if (search?.trim()) {
-      qb.andWhere(
-        `label.search_vector @@ websearch_to_tsquery('simple', unaccent(:search))`,
-        {
-          search: search.trim(),
-        },
-      );
+      qb.addSelect(`ts_rank_cd(label.search_vector, websearch_to_tsquery('simple', unaccent(:search)))`, 'rank')
+        .andWhere(`label.search_vector @@ websearch_to_tsquery('simple', unaccent(:search))`, { search: search.trim() })
+        .orderBy('rank', 'DESC')
+        .addOrderBy('label.created_at', 'DESC')
+        .addOrderBy('label.id', 'DESC');
+    } else {
+      qb.orderBy('label.created_at', 'DESC').addOrderBy('label.id', 'DESC');
     }
 
-    qb.orderBy('label.created_at', 'DESC').addOrderBy('label.id', 'DESC').skip((pageIndex - 1) * limit).take(limit + 1);
+    qb.skip((pageIndex - 1) * limit).take(limit + 1);
+
     const rows = await qb.getMany();
     const hasMore = rows.length > limit;
 
