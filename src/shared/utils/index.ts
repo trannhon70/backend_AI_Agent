@@ -1,3 +1,4 @@
+import { Metadata } from "@grpc/grpc-js";
 import { NormalizedAttachment } from "../interfaces";
 
 //thời gian hết hạn redis
@@ -65,3 +66,8 @@ const resolveMimeType = (type: string): string | null => {
     };
     return map[type] ?? null;
 };
+
+
+export function getCurrentUser(metadata: Metadata): any {
+    return (metadata as Metadata & { user: any }).user;
+}

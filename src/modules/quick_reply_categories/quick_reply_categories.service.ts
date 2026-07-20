@@ -19,7 +19,8 @@ export class QuickReplyCategoriesService {
     private readonly fanpageRepo: Repository<Fanpage>,
   ) { }
 
-  async create(dto: CreateQuickReplyCategoryDto) {
+  async create(dto: CreateQuickReplyCategoryDto, user_id: number) {
+
     if (!dto.page_id) {
       throw new RpcException({ code: status.INVALID_ARGUMENT, message: 'page_id không được để trống!', });
     }

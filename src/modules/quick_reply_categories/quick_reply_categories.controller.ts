@@ -5,17 +5,12 @@ import { CreateQuickReplyCategoryDto } from './dto/create-quick_reply_category.d
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { KafkaService } from '../kafka/kafka.service';
 import { DomainEvents } from '../kafka/kafka.events';
+import { JwtGrpcAuthGuard } from 'src/common/guards/JwtGrpcAuthGuard';
+import { Metadata } from '@grpc/grpc-js';
+import { getCurrentUser } from 'src/shared/utils';
 
-export const CurrentUser = createParamDecorator(
-  (_, ctx: ExecutionContext) => {
 
-    const rpc =
-      ctx.switchToRpc();
-
-    return rpc.getContext().user;
-  },
-);
-
+@UseGuards(JwtGrpcAuthGuard)
 @Controller('quick-reply-categories')
 export class QuickReplyCategoriesController {
   constructor(
@@ -24,21 +19,11 @@ export class QuickReplyCategoriesController {
   ) { }
 
   @GrpcMethod('QuickReplyCategoryService', 'Create')
-  async create(body: CreateQuickReplyCategoryDto, @CurrentUser() user: any) {
-    console.log(user, 'user');
-
-    return await this.quickReplyCategoriesService.create(body);
+  async create(body: CreateQuickReplyCategoryDto, metadata: Metadata,) {
+    const user = getCurrentUser(metadata);
+    return await this.quickReplyCategoriesService.create(body, user.id);
 
   }
 
-  @Post('')
-  @UseGuards(JwtAuthGuard)
-  async insert(dto: CreateQuickReplyCategoryDto,) {
-    const result = await this.kafkaService.send(DomainEvents.quick_reply_categories_insert, dto);
-    return {
-      code: 1,
-      message: 'create success!',
-      data: result
-    };
-  }
+
 }
