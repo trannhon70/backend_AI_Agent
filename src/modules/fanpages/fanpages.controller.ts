@@ -25,7 +25,7 @@ export class FanpagesController {
 
     const result = await this.kafkaService.send(DomainEvents.FanPage_connect_facebook, payload);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'Kết nối facebook thành công!',
       data: result
     };
@@ -41,7 +41,7 @@ export class FanpagesController {
 
     const result = await this.kafkaService.send(DomainEvents.FanPage_tokenRenewal, payload);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'tạo mới token thành công!',
       data: result
     };
@@ -54,7 +54,7 @@ export class FanpagesController {
     const result = await this.fanpagesService.getPageId(req.user.id, param)
 
     return {
-      statusCode: 1,
+      code: 1,
       message: 'get page_id success!',
       data: result
     };
@@ -66,7 +66,7 @@ export class FanpagesController {
   async syncing(@Req() req: any, @Body() payload: any) {
     const result = await this.kafkaService.send(DomainEvents.FanPage_syncing, payload);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'get page_id success!',
       data: result
     };
@@ -78,7 +78,7 @@ export class FanpagesController {
     const result = await this.fanpagesService.createTest()
 
     return {
-      statusCode: 1,
+      code: 1,
       message: 'create test success!',
       data: result
     };

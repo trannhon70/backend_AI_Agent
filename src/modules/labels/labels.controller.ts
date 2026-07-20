@@ -21,7 +21,7 @@ export class LabelsController {
     try {
       const result = await this.kafkaService.send(DomainEvents.label_create, body);
       return {
-        statusCode: 200,
+        code: 200,
         message: 'Thêm mới thẻ hội thoại thành công ',
         data: result
       }
@@ -38,7 +38,7 @@ export class LabelsController {
     try {
       const result = await this.labelsService.delete(param)
       return {
-        statusCode: 200,
+        code: 200,
         message: 'Xóa thẻ hội thoại thành công ',
         data: result
       }
@@ -54,7 +54,7 @@ export class LabelsController {
     try {
       const result = await this.kafkaService.send(DomainEvents.label_update, body);
       return {
-        statusCode: 200,
+        code: 200,
         message: 'Cập nhật thẻ hội thoại thành công ',
         data: result
       }
@@ -69,7 +69,7 @@ export class LabelsController {
   async getPaging(@Query() query: GetPagingLabelDto) {
     const result = await this.labelsService.getPaging(query)
     return {
-      statusCode: 1,
+      code: 1,
       message: 'get getPaging success!',
       data: result
     };
@@ -79,7 +79,7 @@ export class LabelsController {
   async Random() {
     const result = await this.labelsService.random()
     return {
-      statusCode: 1,
+      code: 1,
       message: 'create random success!',
       data: result
     };
@@ -91,7 +91,7 @@ export class LabelsController {
     try {
       const result = await this.kafkaService.send(DomainEvents.label_restore, param);
       return {
-        statusCode: 200,
+        code: 200,
         message: 'Khôi phục thẻ hội thoại thành công ',
         data: result
       }

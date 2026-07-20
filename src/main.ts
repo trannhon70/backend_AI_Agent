@@ -4,6 +4,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { KafkaConstants } from './modules/kafka/kafka.constants';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -40,6 +41,29 @@ async function bootstrap() {
         heartbeatInterval: 3000,
         rebalanceTimeout: 60000,
       },
+    },
+  });
+  // gRPC
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.GRPC,
+    options: {
+      package: [
+        'quick_reply_category',
+      ],
+      //product
+      // protoPath: [
+      //   join(__dirname, 'modules/quick_reply_categories/proto/quick_reply_category.proto'),
+
+      // ],
+      //dev
+      protoPath: [
+        join(process.cwd(), 'src/modules/quick_reply_categories/proto/quick_reply_category.proto'),
+
+      ],
+      url: '0.0.0.0:50051',
+      loader: {
+        keepCase: true,
+      }
     },
   });
 

@@ -23,6 +23,7 @@ import { PageTokensModule } from './modules/page_tokens/page_tokens.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AiModule } from './modules/ai/ai.module';
 import { LabelsModule } from './modules/labels/labels.module';
+import { QuickReplyCategoriesModule } from './modules/quick_reply_categories/quick_reply_categories.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { LabelsModule } from './modules/labels/labels.module';
     PageTokensModule,
     AiModule,
     LabelsModule,
+    QuickReplyCategoriesModule,
 
   ],
   controllers: [AppController],

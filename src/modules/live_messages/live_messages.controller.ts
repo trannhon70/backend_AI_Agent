@@ -19,7 +19,7 @@ export class LiveMessagesController {
   async getPaging(@Query() query: any) {
     const result = await this.liveMessagesService.getPaging(query)
     return {
-      statusCode: 1,
+      code: 1,
       message: 'getpaging messages success!',
       data: result
     };
@@ -30,7 +30,7 @@ export class LiveMessagesController {
   async createRandomMessages(@Req() req: any) {
     const result = await this.liveMessagesService.createRandomMessages(req.user.id)
     return {
-      statusCode: 1,
+      code: 1,
       message: 'create random messages success!',
       data: result
     };

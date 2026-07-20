@@ -37,7 +37,7 @@ export class LabelConsumer {
 
         if (!fanpage) {
             throw new RpcException({
-                statusCode: 404,
+                code: 404,
                 message: 'Không tìm thấy trang fanpage!',
             });
         }
@@ -57,13 +57,13 @@ export class LabelConsumer {
                 error.driverError?.code === '23505'
             ) {
                 throw new RpcException({
-                    statusCode: 409,
+                    code: 409,
                     message: 'Thẻ hội thoại này đã tồn tại!',
                 });
             }
 
             throw new RpcException({
-                statusCode: 500,
+                code: 500,
                 message: 'Internal server error',
             });
         }
@@ -85,13 +85,13 @@ export class LabelConsumer {
                 error.driverError?.code === '23505'
             ) {
                 throw new RpcException({
-                    statusCode: 409,
+                    code: 409,
                     message: 'Thẻ hội thoại này đã tồn tại!',
                 });
             }
 
             throw new RpcException({
-                statusCode: 500,
+                code: 500,
                 message: 'Internal server error',
             });
         }
@@ -109,13 +109,13 @@ export class LabelConsumer {
                 error.driverError?.code === '23505'
             ) {
                 throw new RpcException({
-                    statusCode: 409,
+                    code: 409,
                     message: 'Thẻ hội thoại này đã tồn tại!',
                 });
             }
 
             throw new RpcException({
-                statusCode: 500,
+                code: 500,
                 message: 'Internal server error',
             });
         }

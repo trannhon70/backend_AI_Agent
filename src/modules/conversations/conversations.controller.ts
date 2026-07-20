@@ -17,7 +17,7 @@ export class ConversationsController {
   async getPagging(@Query() query: GetConversationsDto) {
     const result = await this.conversationsService.getPagging(query)
     return {
-      statusCode: 1,
+      code: 1,
       message: 'get page_id success!',
       data: result
     };
@@ -27,7 +27,7 @@ export class ConversationsController {
   async createTest(@Req() req: any) {
     const result = await this.conversationsService.createTest()
     return {
-      statusCode: 1,
+      code: 1,
       message: 'create page_id success!',
       data: result
     };
@@ -38,7 +38,7 @@ export class ConversationsController {
   async updateUnreadCount(@Body() payload: any) {
     const result = await this.kafkaService.send(DomainEvents.conversation_update_unread_count, payload);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'update unread count success!',
       data: result
     };

@@ -26,4 +26,7 @@ export enum DomainEvents {
     label_create = 'label.create',
     label_update = 'label.update',
     label_restore = 'label.restore',
+
+    //quick reply categories
+    quick_reply_categories_insert = "quick_reply_categories.insert"
 }

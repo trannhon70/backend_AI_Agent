@@ -32,7 +32,7 @@ export class UsersController {
     }
     this.kafkaService.publish(DomainEvents.UserCreated, body);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'create user success!',
     };
   }
@@ -41,7 +41,7 @@ export class UsersController {
   async login(@Body() body: any, @ClientInfo() ip: string) {
     const data = await this.usersService.login(body, ip);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'Đăng nhập thành công!',
       token: data.token,
       user: data.user,
@@ -54,7 +54,7 @@ export class UsersController {
   async loginV1(@Body() body: any) {
     const data = await this.usersService.loginV1(body);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'Đăng nhập thành công!',
       token: data.token,
       user: data.user,
@@ -69,7 +69,7 @@ export class UsersController {
   async GetByIdUser(@Req() req: any) {
     const data = await this.usersService.GetByIdUser(req.user.id);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'get by id user success!',
       data: data
     };
@@ -80,7 +80,7 @@ export class UsersController {
   async logout(@Req() req: any) {
     const data = await this.usersService.logout(req.user.id);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'get by id user success!',
       data: data
     };

@@ -14,7 +14,7 @@ export class UserPagesController {
   async getpaging(@Req() req: any, @Query() query: any) {
     const data = await this.userPagesService.getPaging(req.user.id, query);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'get paging user pages success!',
       data: data
     };
@@ -25,7 +25,7 @@ export class UserPagesController {
   async getCountProvider(@Req() req: any) {
     const data = await this.userPagesService.getCountProvider(req.user.id);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'get paging user pages success!',
       data: data
     };
@@ -36,7 +36,7 @@ export class UserPagesController {
   async delete(@Req() req: any, @Param() param: any) {
     const data = await this.userPagesService.delete(param);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'delete user pages success!',
       data: data
     };
@@ -47,7 +47,7 @@ export class UserPagesController {
   async createUserPage(@Req() req: any, @Body() body: any) {
     const data = await this.userPagesService.createUserPage(body);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'create user pages success!',
       data: data
     };
@@ -58,7 +58,7 @@ export class UserPagesController {
   async getPagingUserPageActive(@Query() query: GetPagingUserPageDto) {
     const data = await this.userPagesService.getPagingUserPageActive(query);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'get paging user pages success!',
       data: data
     };

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package quick_reply_category;
+
+service QuickReplyCategoryService {
+
+    rpc Create(CreateRequest)
+        returns (CategoryResponse);
+
+ 
+}
+
+message CreateRequest {
+    string name = 1;
+    string color = 2;
+    string page_id = 3;
+}
+
+
+message CategoryResponse {
+     int32 id = 1;
+      string name = 2;
+      string color = 3;
+      int64 created_at = 4;
+}
+

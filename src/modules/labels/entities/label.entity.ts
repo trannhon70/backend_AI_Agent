@@ -9,7 +9,7 @@ export class Label {
     @PrimaryGeneratedColumn("increment")
     id!: number;
 
-    @Column({ type: 'varchar', length: 100, nullable: true })
+    @Column({ type: 'varchar', nullable: true })
     name!: string | null;
 
     @Column({ type: 'varchar', length: 20, nullable: true })

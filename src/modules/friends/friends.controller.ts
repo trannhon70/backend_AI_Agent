@@ -19,7 +19,7 @@ export class FriendsController {
     console.log(result, 'result');
 
     return {
-      statusCode: 1,
+      code: 1,
       message: 'create friend successfully!',
       data: result
     };
@@ -30,7 +30,7 @@ export class FriendsController {
   async getAllById(@Req() req: any, @Param() param: any) {
     const data = await this.friendsService.getAllById(req, param);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'getAllById friend success!',
       data: data,
     };

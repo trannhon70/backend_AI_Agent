@@ -26,7 +26,7 @@ export class RolesService {
 
       if (existing.length > 0) {
         return {
-          statusCode: 0,
+          code: 0,
           message: 'Role name already exists',
         };
       }

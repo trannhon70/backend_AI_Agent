@@ -1,0 +1,18 @@
+import { IsNotEmpty, IsString, MaxLength } from "class-validator";
+
+export class CreateQuickReplyCategoryDto {
+    @IsString()
+    @IsNotEmpty()
+    name!: string;
+
+
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(20)
+    color!: string;
+
+
+    @IsString()
+    @IsNotEmpty()
+    page_id!: string;
+}

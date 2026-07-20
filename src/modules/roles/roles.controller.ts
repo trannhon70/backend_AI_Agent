@@ -15,7 +15,7 @@ export class RolesController {
   async create(@Body() body: any) {
     const data = await this.rolesService.create(body);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'create role success!',
       data: data
     }
@@ -25,7 +25,7 @@ export class RolesController {
   // async findAll(@Res() res: any) {
   //   const stream = await this.rolesService.findAll();
   //   res.setHeader('Content-Type', 'application/json');
-  //   res.write('{"statusCode":1,"message":"get all role success!","data":[');
+  //   res.write('{"code":1,"message":"get all role success!","data":[');
   //   let first = true;
   //   for await (const row of stream) {
   //     if (!first) res.write(',');
@@ -42,7 +42,7 @@ export class RolesController {
   async findAll() {
     const data = await this.rolesService.findAll();
     return {
-      statusCode: 1,
+      code: 1,
       message: 'get all role success!',
       data: data
     }
@@ -53,7 +53,7 @@ export class RolesController {
   async getPaging(@Query() query: any) {
     const data = await this.rolesService.getPaging(query);
     return {
-      statusCode: 1,
+      code: 1,
       message: 'get paging role success!',
       data: data
     }
