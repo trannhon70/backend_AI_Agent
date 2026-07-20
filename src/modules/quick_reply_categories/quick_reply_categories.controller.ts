@@ -27,12 +27,8 @@ export class QuickReplyCategoriesController {
   async create(body: CreateQuickReplyCategoryDto, @CurrentUser() user: any) {
     console.log(user, 'user');
 
-    const result = await this.quickReplyCategoriesService.create(body);
-    return {
-      code: 1,
-      message: 'create success!',
-      data: result
-    };
+    return await this.quickReplyCategoriesService.create(body);
+
   }
 
   @Post('')

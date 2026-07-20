@@ -1,7 +1,8 @@
 import { Fanpage } from 'src/modules/fanpages/entities/fanpage.entity';
-import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity('quick_reply_category')
+@Unique('uq_QuickReplyCategor_fanpage_id_name', ['fanpage_id', 'name'])
 @Index('idx_QuickReplyCategor_created_at_id', ['created_at', 'id'])
 export class QuickReplyCategory {
     @PrimaryGeneratedColumn("increment")
